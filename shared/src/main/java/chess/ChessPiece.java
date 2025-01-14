@@ -53,6 +53,9 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        PieceMoveCalculator calculator = new PieceMoveCalculator(type, board, myPosition);
+        if(type == PieceType.BISHOP){calculator = new BishopMoveCalculator(type, board, myPosition);}
+
+        return calculator.getPossibleMoves();
     }
 }
