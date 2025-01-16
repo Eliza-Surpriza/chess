@@ -81,10 +81,14 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMoveCalculator calculator = new PieceMoveCalculator(type, board, myPosition, pieceColor);
-        if (type == PieceType.BISHOP) {
-            calculator = new BishopMoveCalculator(type, board, myPosition, pieceColor);
-        }
+        PieceMoveCalculator calculator = switch (type) {
+            case PieceType.BISHOP -> new BishopMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.ROOK -> new RookMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.QUEEN -> new QueenMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.KNIGHT -> new KnightMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.KING -> new KingMoveCalculator(type, board, myPosition, pieceColor);
+            default -> new PieceMoveCalculator(type, board, myPosition, pieceColor);
+        };
 
         return calculator.getPossibleMoves();
     }
