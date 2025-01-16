@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -10,9 +11,36 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+
+    @Override
+    public String toString() {
+        String letter = switch (type) {
+            case PieceType.KING -> "K";
+            case PieceType.BISHOP -> "B";
+            case PieceType.QUEEN -> "Q";
+            case PieceType.KNIGHT -> "N";
+            case PieceType.PAWN -> "P";
+            case PieceType.ROOK -> "R";
+        };
+        if(pieceColor == ChessGame.TeamColor.BLACK){letter = letter.toLowerCase();}
+        return letter;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -53,8 +81,10 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMoveCalculator calculator = new PieceMoveCalculator(type, board, myPosition);
-        if(type == PieceType.BISHOP){calculator = new BishopMoveCalculator(type, board, myPosition);}
+        PieceMoveCalculator calculator = new PieceMoveCalculator(type, board, myPosition, pieceColor);
+        if (type == PieceType.BISHOP) {
+            calculator = new BishopMoveCalculator(type, board, myPosition, pieceColor);
+        }
 
         return calculator.getPossibleMoves();
     }
