@@ -87,7 +87,7 @@ public class ChessPiece {
             case PieceType.QUEEN -> new QueenMoveCalculator(type, board, myPosition, pieceColor);
             case PieceType.KNIGHT -> new KnightMoveCalculator(type, board, myPosition, pieceColor);
             case PieceType.KING -> new KingMoveCalculator(type, board, myPosition, pieceColor);
-            default -> new PieceMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.PAWN -> new PawnMoveCalculator(type, board, myPosition, pieceColor);
         };
 
         return calculator.getPossibleMoves();

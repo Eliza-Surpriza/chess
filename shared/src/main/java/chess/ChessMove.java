@@ -12,10 +12,11 @@ public class ChessMove {
 
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
+    private final ChessPiece.PieceType promotionPiece;
 
     @Override
     public String toString() {
-        return "(" + startPosition.getRow() + ", " + startPosition.getColumn() + ") to (" + endPosition.getRow() + ", " + endPosition.getColumn() + ")";
+        return "(" + startPosition.getRow() + ", " + startPosition.getColumn() + ") to (" + endPosition.getRow() + ", " + endPosition.getColumn() + "), promotion: " + promotionPiece;
     }
 
     @Override
@@ -32,7 +33,7 @@ public class ChessMove {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 
-    private final ChessPiece.PieceType promotionPiece;
+
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
