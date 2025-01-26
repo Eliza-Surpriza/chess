@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15bf5837-dd36-47d1-8181-3e8af2d015c0" name="Changes" comment="" />
+    <list default="true" id="15bf5837-dd36-47d1-8181-3e8af2d015c0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/BishopMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/BishopMoveCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/ChessBoard.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/ChessBoard.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/ChessPiece.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/ChessPiece.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/KingMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/KingMoveCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/KnightMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/KnightMoveCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/PieceMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/PieceMoveCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/QueenMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/QueenMoveCalculator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../shared/src/main/java/chess/RookMoveCalculator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../shared/src/main/java/chess/RookMoveCalculator.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -25,6 +34,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -37,6 +47,19 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="chess" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="chess" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -54,6 +77,7 @@
       <option name="presentableId" value="Default" />
       <updated>1736877899270</updated>
       <workItem from="1736877901432" duration="1232000" />
+      <workItem from="1737860566989" duration="35000" />
     </task>
     <servers />
   </component>
