@@ -10,9 +10,9 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private final ChessPosition startPosition;
-    private final ChessPosition endPosition;
-    private final ChessPiece.PieceType promotionPiece;
+    public final ChessPosition startPosition;
+    public final ChessPosition endPosition;
+    public final ChessPiece.PieceType promotionPiece;
 
     @Override
     public String toString() {

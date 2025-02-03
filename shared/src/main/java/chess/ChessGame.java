@@ -13,7 +13,9 @@ public class ChessGame {
     public TeamColor currentTeam;
     public ChessBoard gameBoard;
     public ChessGame() {
-
+        this.currentTeam = TeamColor.WHITE;
+        this.gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
     }
 
     /**
@@ -69,12 +71,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
-        // deep copy the chess board
-        // make move
-        // check if in check/checkmate using methods
-        // if valid, make move
-        // else throw exception
+        ChessPiece piece = gameBoard.getPiece(move.startPosition);
+        if (piece.getTeamColor() != currentTeam) {
+            throw new InvalidMoveException();
+        }
+        Collection<ChessMove> valid = validMoves(move.startPosition);
+        if (valid.contains(move)) {
+            // do move
+            if (move.promotionPiece != null) {
+                piece = new ChessPiece(currentTeam, move.promotionPiece);
+            }
+            gameBoard.addPiece(move.endPosition, piece);
+            gameBoard.removePiece(move.startPosition);
+        } else {
+            throw new InvalidMoveException();
+        }
     }
 
     /**
@@ -117,8 +128,11 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
-        // if get valid moves method returns empty collection, return true
-        // how to check if a collection is empty??
+        // for piece in team
+            // if get valid moves method returns not empty collection, return false
+        // return true
+        // how to check if a collection is empty: .isEmpty()
+
     }
 
     /**
