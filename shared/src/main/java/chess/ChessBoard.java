@@ -9,7 +9,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
     private final ChessPiece[][] squares = new ChessPiece[8][8];
 
     @Override
@@ -41,10 +41,38 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
+
+    // kinda confused about this honestly...
+
     public ChessBoard() {
         
     }
+    //    @Override
+//    protected Object clone() throws CloneNotSupportedException {
+//        return super.clone();
+//    }
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
 
+            // Comment these lines out to see what happens with a shallow copy that contains a mutable instance variable
+            ChessPiece[][] squares_copy = new ChessPiece[8][8];
+            for (int row = 1; row <= 8; row++) {
+                for (int col = 1; col <= 8; col++) {
+                    ChessPosition position = new ChessPosition(row, col);
+                    ChessPiece piece = clone.getPiece(position);
+                    if (piece == null) {
+                        clone.removePiece(position);
+                    } else {
+                        clone.addPiece(position, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+                    }
+                }}
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
     /**
      * Adds a chess piece to the chessboard
      *
