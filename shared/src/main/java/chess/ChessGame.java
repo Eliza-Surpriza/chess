@@ -97,12 +97,17 @@ public class ChessGame implements Cloneable {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = gameBoard.getPiece(move.startPosition);
-        if (piece.getTeamColor() != currentTeam) {
+        if (piece == null || piece.getTeamColor() != currentTeam) {
             throw new InvalidMoveException();
         }
+        // hmm actually I don't think I need to check edges because I check if it's in valid moves.
+        //move.getStartPosition().getRow() > 8 || move.getStartPosition().getColumn() < 1 || move.getEndPosition().getRow() > 8 || move.getEndPosition().getColumn() < 1 ||
         Collection<ChessMove> valid = validMoves(move.startPosition);
         if (valid.contains(move)) {
             doMove(move);
+            if (currentTeam == TeamColor.WHITE) {
+                this.setTeamTurn(TeamColor.BLACK);
+            } else {this.setTeamTurn(TeamColor.WHITE);}
         } else {
             throw new InvalidMoveException();
         }
