@@ -19,6 +19,18 @@ public class ChessGame {
         gameBoard.resetBoard();
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        try {
+            ChessGame clone = (ChessGame) super.clone();
+            // clone team color?
+            clone.gameBoard = clone.gameBoard.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -58,6 +70,7 @@ public class ChessGame {
         Collection<ChessMove> valid = new ArrayList<>();
         for (ChessMove move : possibleMoves) {
             // deep copy the chess board
+            ChessBoard boardCopy = gameBoard.clone();
             // make move
             // check if in check/checkmate using methods
             // if valid, add to valid
