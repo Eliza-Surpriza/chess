@@ -12,6 +12,7 @@ import java.util.Collection;
 public class ChessGame {
     public TeamColor currentTeam;
     public ChessBoard gameBoard;
+
     public ChessGame() {
         this.currentTeam = TeamColor.WHITE;
         this.gameBoard = new ChessBoard();
@@ -38,8 +39,7 @@ public class ChessGame {
      * Enum identifying the 2 possible teams in a chess game
      */
     public enum TeamColor {
-        WHITE,
-        BLACK
+        WHITE, BLACK
     }
 
     /**
@@ -51,7 +51,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = gameBoard.getPiece(startPosition);
-        if(piece == null) {return null;}
+        if (piece == null) {
+            return null;
+        }
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> valid = new ArrayList<>();
         for (ChessMove move : possibleMoves) {
@@ -95,12 +97,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
         // for all the pieces on the other team:
-            // deep copy the chess board
-            // for all their valid moves:
-                // if it includes the square the king is on, return true
-        // return false
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() != teamColor) {
+                    // for all their valid moves:
+                    Collection<ChessMove> valid = validMoves(position);
+                    for (ChessMove move : valid) {
+                        // if it includes the square the king is on, return true
+                        if (gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -110,13 +123,21 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
         // if in check
-        // for all the pieces on team:
-            // deep copy the chess board
-            // for all their valid moves:
-                // if not in check anymore, return false
-        // return true
+        if (isInCheck(teamColor)) {
+            for (int row = 1; row <= 8; row++) {
+                for (int col = 1; col <= 8; col++) {
+
+                    // deep copy the chess board
+                    // for all their valid moves:
+                    // if not in check anymore, return false
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     /**
@@ -127,11 +148,21 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
         // for piece in team
-            // if get valid moves method returns not empty collection, return false
+        // if get valid moves method returns not empty collection, return false
         // return true
         // how to check if a collection is empty: .isEmpty()
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+                    // for all their valid moves:
+                    Collection<ChessMove> valid = validMoves(position);
+                    if (!valid.isEmpty()) {return false;}
+                }
+            }
+        }
+        return true;
 
     }
 
