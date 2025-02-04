@@ -57,7 +57,6 @@ public class ChessBoard implements Cloneable{
             ChessBoard clone = (ChessBoard) super.clone();
 
             // Comment these lines out to see what happens with a shallow copy that contains a mutable instance variable
-            ChessPiece[][] squares_copy = new ChessPiece[8][8];
             for (int row = 1; row <= 8; row++) {
                 for (int col = 1; col <= 8; col++) {
                     ChessPosition position = new ChessPosition(row, col);

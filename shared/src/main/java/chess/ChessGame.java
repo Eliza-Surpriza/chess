@@ -9,7 +9,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame implements Cloneable {
     public TeamColor currentTeam;
     public ChessBoard gameBoard;
 
@@ -23,9 +23,17 @@ public class ChessGame {
     protected Object clone() throws CloneNotSupportedException {
         try {
             ChessGame clone = (ChessGame) super.clone();
-            // clone team color?
-            clone.gameBoard = clone.gameBoard.clone();
+            clone.setBoard(clone.getBoard().clone());
+            clone.setTeamTurn(clone.getTeamTurn());
             return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ChessGame deepCopy() {
+        try {
+            return (ChessGame) this.clone();
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
@@ -69,12 +77,14 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> valid = new ArrayList<>();
         for (ChessMove move : possibleMoves) {
-            // deep copy the chess board
-            ChessBoard boardCopy = gameBoard.clone();
+            // deep copy the chess game
+            ChessGame gameCopy = this.deepCopy();
             // make move
+            gameCopy.doMove(move);
             // check if in check/checkmate using methods
-            // if valid, add to valid
-            valid.add(move);
+            if (!gameCopy.isInCheck(gameCopy.getTeamTurn())) {
+                valid.add(move);
+            }
         }
         return valid;
     }
@@ -92,15 +102,20 @@ public class ChessGame {
         }
         Collection<ChessMove> valid = validMoves(move.startPosition);
         if (valid.contains(move)) {
-            // do move
-            if (move.promotionPiece != null) {
-                piece = new ChessPiece(currentTeam, move.promotionPiece);
-            }
-            gameBoard.addPiece(move.endPosition, piece);
-            gameBoard.removePiece(move.startPosition);
+            doMove(move);
         } else {
             throw new InvalidMoveException();
         }
+    }
+
+    public void doMove(ChessMove move) {
+        // do move
+        ChessPiece piece = gameBoard.getPiece(move.startPosition);
+        if (move.promotionPiece != null) {
+            piece = new ChessPiece(currentTeam, move.promotionPiece);
+        }
+        gameBoard.addPiece(move.endPosition, piece);
+        gameBoard.removePiece(move.startPosition);
     }
 
     /**
