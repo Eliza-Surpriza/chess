@@ -23,7 +23,8 @@ public class ChessGame implements Cloneable {
     protected Object clone() throws CloneNotSupportedException {
         try {
             ChessGame clone = (ChessGame) super.clone();
-            clone.setBoard(clone.getBoard().clone());
+            ChessBoard frog = clone.getBoard().clone();
+            clone.setBoard(frog);
             clone.setTeamTurn(clone.getTeamTurn());
             return clone;
         } catch (CloneNotSupportedException e) {

@@ -3,7 +3,7 @@ package chess;
 import java.util.Collection;
 
 public class PawnMoveCalculator extends PieceMoveCalculator{
-    public PawnMoveCalculator(ChessPiece.PieceType type, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor pieceColor) {
+    public PawnMoveCalculator(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor pieceColor) {
         super(board, myPosition, pieceColor);
     }
 

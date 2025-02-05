@@ -10,7 +10,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard implements Cloneable{
-    private final ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] squares = new ChessPiece[8][8];
 
     @Override
     public String toString() {
@@ -55,12 +55,11 @@ public class ChessBoard implements Cloneable{
     public ChessBoard clone() {
         try {
             ChessBoard clone = (ChessBoard) super.clone();
-
-            // Comment these lines out to see what happens with a shallow copy that contains a mutable instance variable
+            clone.squares = new ChessPiece[8][8];
             for (int row = 1; row <= 8; row++) {
                 for (int col = 1; col <= 8; col++) {
                     ChessPosition position = new ChessPosition(row, col);
-                    ChessPiece piece = clone.getPiece(position);
+                    ChessPiece piece = this.getPiece(position);
                     if (piece == null) {
                         clone.removePiece(position);
                     } else {
