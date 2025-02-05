@@ -81,12 +81,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceMoveCalculator calculator = switch (type) {
-            case PieceType.BISHOP -> new BishopMoveCalculator(type, board, myPosition, pieceColor);
-            case PieceType.ROOK -> new RookMoveCalculator(type, board, myPosition, pieceColor);
-            case PieceType.QUEEN -> new QueenMoveCalculator(type, board, myPosition, pieceColor);
-            case PieceType.KNIGHT -> new KnightMoveCalculator(type, board, myPosition, pieceColor);
-            case PieceType.KING -> new KingMoveCalculator(type, board, myPosition, pieceColor);
-            case PieceType.PAWN -> new PawnMoveCalculator(type, board, myPosition, pieceColor);
+            case PieceType.BISHOP -> new BishopMoveCalculator(board, myPosition, pieceColor);
+            case PieceType.ROOK -> new RookMoveCalculator(board, myPosition, pieceColor);
+            case PieceType.QUEEN -> new QueenMoveCalculator(board, myPosition, pieceColor);
+            case PieceType.KNIGHT -> new KnightMoveCalculator(board, myPosition, pieceColor);
+            case PieceType.KING -> new KingMoveCalculator(board, myPosition, pieceColor);
+            case PieceType.PAWN -> new PawnMoveCalculator(board, myPosition, pieceColor);
         };
 
         return calculator.getPossibleMoves();

@@ -2,65 +2,37 @@ package chess;
 
 import java.util.Collection;
 
-public class KingMoveCalculator extends PieceMoveCalculator {
-
-    public KingMoveCalculator(ChessPiece.PieceType type, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor pieceColor) {
-        super(type, board, myPosition, pieceColor);
-
+public class KingMoveCalculator extends PieceMoveCalculator{
+    public KingMoveCalculator(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
+        super(board, myPosition, color);
     }
 
     public Collection<ChessMove> getPossibleMoves() {
-        Collection<ChessMove> possibleMoves = super.getPossibleMoves();
-        ChessPosition endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
         // up
-        if(myPosition.getRow() < 8) {
-            endPosition = new ChessPosition(endPosition.getRow() + 1, endPosition.getColumn());
-            addMoveKnightKing(endPosition);
-        }
-
+        ChessPosition endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+        addOneMove(endPosition, 1, 0);
         // right
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getColumn() < 8) {
-            endPosition = new ChessPosition(endPosition.getRow(), endPosition.getColumn() + 1);
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, 0, 1);
         // down
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() > 1) {
-            endPosition = new ChessPosition(endPosition.getRow() - 1, endPosition.getColumn());
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, -1, 0);
         // left
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() > 1) {
-            endPosition = new ChessPosition(endPosition.getRow(), endPosition.getColumn() - 1);
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, 0, -1);
         // up and right
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() < 8 && myPosition.getColumn() < 8) {
-            endPosition = new ChessPosition(endPosition.getRow() + 1, endPosition.getColumn() + 1);
-            addMoveKnightKing(endPosition);
-        }
-
-        // up and left
-        endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() < 8 && myPosition.getColumn() > 1) {
-            endPosition = new ChessPosition(endPosition.getRow() + 1, endPosition.getColumn() - 1);
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, 1, 1);
         // down and right
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() > 1 && myPosition.getColumn() < 8) {
-            endPosition = new ChessPosition(endPosition.getRow() - 1, endPosition.getColumn() + 1);
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, -1, 1);
         // down and left
         endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
-        if(myPosition.getRow() > 1 && myPosition.getColumn() > 1) {
-            endPosition = new ChessPosition(endPosition.getRow() - 1, endPosition.getColumn() - 1);
-            addMoveKnightKing(endPosition);
-        }
+        addOneMove(endPosition, -1, -1);
+        // up and left
+        endPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+        addOneMove(endPosition, 1, -1);
+
         return possibleMoves;
     }
 }

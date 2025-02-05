@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public class PawnMoveCalculator extends PieceMoveCalculator{
     public PawnMoveCalculator(ChessPiece.PieceType type, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor pieceColor) {
-        super(type, board, myPosition, pieceColor);
+        super(board, myPosition, pieceColor);
     }
 
     public void addPosition(ChessPosition end, int forwardOne) {

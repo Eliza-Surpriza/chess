@@ -136,10 +136,10 @@ public class ChessGame implements Cloneable {
                 ChessPosition position = new ChessPosition(row, col);
                 if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() != teamColor) {
                     // for all their valid moves:
-                    Collection<ChessMove> valid = validMoves(position);
-                    for (ChessMove move : valid) {
+                    Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
+                    for (ChessMove move : moves) {
                         // if it includes the square the king is on, return true
-                        if (gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
+                        if (gameBoard.getPiece(move.endPosition) != null && gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
                             return true;
                         }
                     }
