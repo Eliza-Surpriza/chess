@@ -80,11 +80,10 @@ public class ChessGame implements Cloneable {
         for (ChessMove move : possibleMoves) {
             // deep copy the chess game
             ChessGame gameCopy = this.deepCopy();
-            gameCopy.setTeamTurn(piece.getTeamColor());
             // make move
             gameCopy.doMove(move);
             // check if in check/checkmate using methods
-            if (!gameCopy.isInCheck(gameCopy.getTeamTurn())) {
+            if (!gameCopy.isInCheck(piece.getTeamColor())) {
                 valid.add(move);
             }
         }
@@ -163,10 +162,21 @@ public class ChessGame implements Cloneable {
         if (isInCheck(teamColor)) {
             for (int row = 1; row <= 8; row++) {
                 for (int col = 1; col <= 8; col++) {
-
-                    // deep copy the chess board
-                    // for all their valid moves:
-                    // if not in check anymore, return false
+                    // for all my valid moves:
+                    ChessPosition position = new ChessPosition(row, col);
+                    if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+                        Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
+                        for (ChessMove move : moves) {
+                            // deep copy the chess game
+                            ChessGame gameCopy = this.deepCopy();
+                            // do move
+                            // if not in check anymore, return false
+                            gameCopy.doMove(move);
+                            if (!gameCopy.isInCheck(teamColor)) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
             return true;
@@ -188,6 +198,7 @@ public class ChessGame implements Cloneable {
         // if get valid moves method returns not empty collection, return false
         // return true
         // how to check if a collection is empty: .isEmpty()
+        if (isInCheck(teamColor)) {return false;}
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
