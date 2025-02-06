@@ -80,6 +80,7 @@ public class ChessGame implements Cloneable {
         for (ChessMove move : possibleMoves) {
             // deep copy the chess game
             ChessGame gameCopy = this.deepCopy();
+            gameCopy.setTeamTurn(piece.getTeamColor());
             // make move
             gameCopy.doMove(move);
             // check if in check/checkmate using methods
@@ -122,6 +123,7 @@ public class ChessGame implements Cloneable {
         }
         gameBoard.addPiece(move.endPosition, piece);
         gameBoard.removePiece(move.startPosition);
+
     }
 
     /**
