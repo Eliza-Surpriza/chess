@@ -7,6 +7,8 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 
+import java.util.Objects;
+
 public class UserService {
 
     private final MemoryUserDAO userDAO;
@@ -25,9 +27,16 @@ public class UserService {
         return authDAO.createAuth(registerRequest.username());
     }
     public AuthData login(UserData loginRequest) throws DataAccessException{
-
+        UserData userData = userDAO.getUser(loginRequest.username());
+        if(!Objects.equals(userData.password(), loginRequest.password())) {
+            throw new DataAccessException("Error: unauthorized"); // error code 401
+        }
+        return authDAO.createAuth(loginRequest.username());
     }
     public void logout(String logoutRequest) throws DataAccessException{
-
+        if(!(authDAO.getAuth(logoutRequest) == null)) {
+            throw new DataAccessException("Error: unauthorized"); // error code 401
+        }
+        authDAO.deleteAuth(logoutRequest);
     }
 }
