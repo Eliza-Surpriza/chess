@@ -27,6 +27,7 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::create);
+        Spark.put("/game", this::join);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -71,5 +72,14 @@ public class Server {
         var createRequest = new Gson().fromJson(req.body(), CreateRequest.class);
         CreateResult createResult = gameService.createGame(createRequest);
         return new Gson().toJson(createResult);
+    }
+
+    private Object join(Request req, Response res) throws ResponseException {
+        var authToken = req.headers("authorization");
+        authService.authorize(authToken);
+        var partialJoinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
+        JoinRequest joinRequest = new JoinRequest(partialJoinRequest.playerColor(), partialJoinRequest.gameID(), authToken);
+        gameService.joinGame(joinRequest);
+        return "";
     }
 }
