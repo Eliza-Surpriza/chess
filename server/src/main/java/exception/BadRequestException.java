@@ -1,7 +1,7 @@
 package exception;
 
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends ResponseException {
     public BadRequestException(String message) {
-        super(message);
+        super(400, message);
     }
 }
