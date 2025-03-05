@@ -1,22 +1,20 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import exception.ResponseException;
-import model.AuthData;
-import model.UserData;
-import model.LoginRequest;
+import model.*;
 import service.AuthService;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
 public class Server {
     AuthDAO authDAO = new MemoryAuthDAO();
     UserDAO userDAO = new MemoryUserDAO();
+    GameDAO gameDAO = new MemoryGameDAO();
     UserService userService = new UserService(userDAO, authDAO);
+    GameService gameService = new GameService(gameDAO, authDAO);
     AuthService authService = new AuthService(authDAO);
 
     public int run(int desiredPort) {
@@ -28,6 +26,7 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.post("/game", this::create);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -64,5 +63,13 @@ public class Server {
         authService.authorize(authToken);
         userService.logout(authToken);
         return "";
+    }
+
+    private Object create(Request req, Response res) throws ResponseException {
+        var authToken = req.headers("authorization");
+        authService.authorize(authToken);
+        var createRequest = new Gson().fromJson(req.body(), CreateRequest.class);
+        CreateResult createResult = gameService.createGame(createRequest);
+        return new Gson().toJson(createResult);
     }
 }
