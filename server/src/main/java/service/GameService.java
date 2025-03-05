@@ -35,13 +35,13 @@ public class GameService {
         }
         GameData newData;
         if (joinRequest.playerColor().equals("WHITE")) {
-            if (gameData.whiteUsername() != null) {
+            if (gameData.whiteUsername() == null) {
                 newData = new GameData(gameData.GameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
             } else {
                 throw new AlreadyTakenException("already taken");
             }
         } else if (joinRequest.playerColor().equals("BLACK")) {
-            if (gameData.blackUsername() != null) {
+            if (gameData.blackUsername() == null) {
                 newData = new GameData(gameData.GameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
             } else {
                 throw new AlreadyTakenException("already taken");

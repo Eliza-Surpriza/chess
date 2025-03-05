@@ -22,9 +22,7 @@ class UserServiceTest {
         // register username "felicity" password "1774"
         // register user "samantha" password "1904"
         // login user "samantha" password "1904"
-        try {
-            userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
-        } catch(AlreadyTakenException ignored) {}
+        userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
     }
 
     @Test
