@@ -30,4 +30,8 @@ public class MemoryGameDAO implements GameDAO {
         games.clear();
     }
 
+    public void updateGame(GameData gameData) {
+        games.put(gameData.GameID(), gameData);
+    }
+
 }
