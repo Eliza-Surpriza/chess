@@ -3,7 +3,9 @@ package service;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import exception.AlreadyTakenException;
+import exception.UnauthorizedException;
 import model.AuthData;
+import model.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,8 +24,6 @@ class UserServiceTest {
         // login user "samantha" password "1904"
         try {
             userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
-            userService.register(new UserData("samantha", "1904", "sparkington@gmail.com"));
-            userService.login(new UserData("samantha", "1904", "sparkington@gmail.com"));
         } catch(AlreadyTakenException ignored) {}
     }
 
@@ -42,13 +42,37 @@ class UserServiceTest {
 
     @Test
     void login() {
-        // sign in with username "felicity" password "wrong_password" get error
         // sign in with username "felicity" password "1774"
+        AuthData result = userService.login(new LoginRequest("felicity", "1774"));
+        assertEquals("felicity", result.username());
     }
 
     @Test
+    void loginUnauthorized() {
+        // sign in with username "felicity" password "wrong_password" get error
+        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("felicity", "wrong!")));
+
+    }
+
+    @Test
+    void loginWrongUsername() {
+        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("wrong!", "1774")));
+
+    }
+
+
+    @Test
     void logout() {
+        // logout with correct auth token, try again with same auth token, get error
+        AuthData result = userService.login(new LoginRequest("felicity", "1774"));
+        userService.logout(result.authToken());
+        assertThrows(UnauthorizedException.class, () -> userService.logout(result.authToken()));
+    }
+
+    @Test
+    void logoutUnauthorized() {
         // logout with wrong auth token, get error
-        // logout with correct auth token, no error
+        assertThrows(UnauthorizedException.class, () -> userService.logout("wrong!"));
+
     }
 }

@@ -3,10 +3,10 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
-import exception.AlreadyTakenException;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import model.LoginRequest;
 import service.UserService;
 import spark.*;
 
@@ -22,11 +22,11 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register);
-
+        Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -47,5 +47,17 @@ public class Server {
         var userData = new Gson().fromJson(req.body(), UserData.class);
         AuthData authData = userService.register(userData);
         return new Gson().toJson(authData);
+    }
+
+    private Object login(Request req, Response res) throws ResponseException {
+        var loginRequest = new Gson().fromJson(req.body(), LoginRequest.class);
+        AuthData authData = userService.login(loginRequest);
+        return new Gson().toJson(authData);
+    }
+
+    private Object logout(Request req, Response res) throws ResponseException {
+        var authToken = req.headers("authorization");
+        userService.logout(authToken);
+        return "";
     }
 }

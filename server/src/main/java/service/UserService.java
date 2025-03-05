@@ -1,13 +1,12 @@
 package service;
 
-import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
 import exception.AlreadyTakenException;
 import exception.BadRequestException;
 import exception.UnauthorizedException;
 import model.AuthData;
+import model.LoginRequest;
 import model.UserData;
 
 import java.util.Objects;
@@ -31,15 +30,15 @@ public class UserService {
         userDAO.createUser(registerRequest);
         return authDAO.createAuth(registerRequest.username());
     }
-    public AuthData login(UserData loginRequest) throws UnauthorizedException{
+    public AuthData login(LoginRequest loginRequest) throws UnauthorizedException{
         UserData userData = userDAO.getUser(loginRequest.username());
-        if(!Objects.equals(userData.password(), loginRequest.password())) {
+        if(userData == null || !Objects.equals(userData.password(), loginRequest.password())) {
             throw new UnauthorizedException("Error: unauthorized"); // error code 401
         }
         return authDAO.createAuth(loginRequest.username());
     }
     public void logout(String logoutRequest) throws UnauthorizedException{
-        if(!(authDAO.getAuth(logoutRequest) == null)) {
+        if((authDAO.getAuth(logoutRequest) == null)) {
             throw new UnauthorizedException("Error: unauthorized"); // error code 401
         }
         authDAO.deleteAuth(logoutRequest);
