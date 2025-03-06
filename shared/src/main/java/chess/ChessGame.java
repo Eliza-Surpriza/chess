@@ -145,20 +145,31 @@ public class ChessGame implements Cloneable {
     public boolean isInCheck(TeamColor teamColor) {
         // for all the pieces on the other team:
         for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                if (gameBoard.getPiece(position) != null
-                        && gameBoard.getPiece(position).getTeamColor() != teamColor) {
-                    // for all their valid moves:
-                    Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
-                    for (ChessMove move : moves) {
-                        // if it includes the square the king is on, return true
-                        if (gameBoard.getPiece(move.endPosition) != null
-                                && gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
-                            return true;
-                        }
-                    }
-                }
+            if (checkInnerLoop(row, teamColor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkInnerLoop(int row, TeamColor teamColor) {
+        for (int col = 1; col <= 8; col++) {
+            ChessPosition position = new ChessPosition(row, col);
+            if (gameBoard.getPiece(position) != null
+                    && gameBoard.getPiece(position).getTeamColor() != teamColor
+                    && checkAllMoves(position)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkAllMoves(ChessPosition position) {
+        Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
+        for (ChessMove move : moves) {
+            if (gameBoard.getPiece(move.endPosition) != null
+                    && gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
+                return true;
             }
         }
         return false;
@@ -171,33 +182,41 @@ public class ChessGame implements Cloneable {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        // if in check
-        if (isInCheck(teamColor)) {
-            for (int row = 1; row <= 8; row++) {
-                for (int col = 1; col <= 8; col++) {
-                    // for all my valid moves:
-                    ChessPosition position = new ChessPosition(row, col);
-                    if (gameBoard.getPiece(position) != null
-                            && gameBoard.getPiece(position).getTeamColor() == teamColor) {
-                        Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
-                        for (ChessMove move : moves) {
-                            // deep copy the chess game
-                            ChessGame gameCopy = this.deepCopy();
-                            // do move
-                            // if not in check anymore, return false
-                            gameCopy.doMove(move);
-                            if (!gameCopy.isInCheck(teamColor)) {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return isInCheck(teamColor) && checkmateLoop(teamColor);
 
+    }
+
+    private boolean checkmateLoop(TeamColor teamColor) {
+        for (int row = 1; row <= 8; row++) {
+            if (!checkmateInnerLoop(row, teamColor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkmateInnerLoop(int row, TeamColor teamColor) {
+        for (int col = 1; col <= 8; col++) {
+            ChessPosition position = new ChessPosition(row, col);
+            if (gameBoard.getPiece(position) != null
+                    && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+                return checkAllMoves(position, teamColor);
+            }
+        }
+        return true;
+
+    }
+
+    private boolean checkAllMoves(ChessPosition position, TeamColor teamColor) {
+        Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
+        for (ChessMove move : moves) {
+            ChessGame gameCopy = this.deepCopy();
+            gameCopy.doMove(move);
+            if (!gameCopy.isInCheck(teamColor)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -212,20 +231,29 @@ public class ChessGame implements Cloneable {
             return false;
         }
         for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                if (gameBoard.getPiece(position) != null
-                        && gameBoard.getPiece(position).getTeamColor() == teamColor) {
-                    // for all their valid moves:
-                    Collection<ChessMove> valid = validMoves(position);
-                    if (!valid.isEmpty()) {
-                        return false;
-                    }
-                }
+            if(!stalemateInnerLoop(row, teamColor)) {
+                return false;
             }
         }
         return true;
+    }
 
+    private boolean stalemateInnerLoop(int row, TeamColor teamColor) {
+        for (int col = 1; col <= 8; col++) {
+            if (!stalemateByPosition(row, col, teamColor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean stalemateByPosition(int row, int col, TeamColor teamColor) {
+        ChessPosition position = new ChessPosition(row, col);
+        if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+            Collection<ChessMove> valid = validMoves(position);
+            return valid.isEmpty();
+        }
+        return true;
     }
 
     /**
