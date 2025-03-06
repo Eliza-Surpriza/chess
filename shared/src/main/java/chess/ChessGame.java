@@ -92,11 +92,8 @@ public class ChessGame implements Cloneable {
         Collection<ChessMove> possibleMoves = piece.pieceMoves(gameBoard, startPosition);
         Collection<ChessMove> valid = new ArrayList<>();
         for (ChessMove move : possibleMoves) {
-            // deep copy the chess game
             ChessGame gameCopy = this.deepCopy();
-            // make move
             gameCopy.doMove(move);
-            // check if in check/checkmate using methods
             if (!gameCopy.isInCheck(piece.getTeamColor())) {
                 valid.add(move);
             }
@@ -115,8 +112,6 @@ public class ChessGame implements Cloneable {
         if (piece == null || piece.getTeamColor() != currentTeam) {
             throw new InvalidMoveException();
         }
-        // hmm actually I don't think I need to check edges because I check if it's in valid moves.
-        //move.getStartPosition().getRow() > 8 || move.getStartPosition().getColumn() < 1 || move.getEndPosition().getRow() > 8 || move.getEndPosition().getColumn() < 1 ||
         Collection<ChessMove> valid = validMoves(move.startPosition);
         if (valid.contains(move)) {
             doMove(move);
@@ -152,7 +147,8 @@ public class ChessGame implements Cloneable {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-                if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() != teamColor) {
+                if (gameBoard.getPiece(position) != null
+                        && gameBoard.getPiece(position).getTeamColor() != teamColor) {
                     // for all their valid moves:
                     Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
                     for (ChessMove move : moves) {
@@ -212,17 +208,14 @@ public class ChessGame implements Cloneable {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        // for piece in team
-        // if get valid moves method returns not empty collection, return false
-        // return true
-        // how to check if a collection is empty: .isEmpty()
         if (isInCheck(teamColor)) {
             return false;
         }
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
-                if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+                if (gameBoard.getPiece(position) != null
+                        && gameBoard.getPiece(position).getTeamColor() == teamColor) {
                     // for all their valid moves:
                     Collection<ChessMove> valid = validMoves(position);
                     if (!valid.isEmpty()) {

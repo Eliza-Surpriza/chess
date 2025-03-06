@@ -52,20 +52,24 @@ public class ChessBoard implements Cloneable {
         try {
             ChessBoard clone = (ChessBoard) super.clone();
             clone.squares = new ChessPiece[8][8];
-            for (int row = 1; row <= 8; row++) {
-                for (int col = 1; col <= 8; col++) {
-                    ChessPosition position = new ChessPosition(row, col);
-                    ChessPiece piece = this.getPiece(position);
-                    if (piece == null) {
-                        clone.removePiece(position);
-                    } else {
-                        clone.addPiece(position, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
-                    }
-                }
-            }
+            cloneInnerLoops(clone);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void cloneInnerLoops(ChessBoard clone) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = this.getPiece(position);
+                if (piece == null) {
+                    clone.removePiece(position);
+                } else {
+                    clone.addPiece(position, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+                }
+            }
         }
     }
 
