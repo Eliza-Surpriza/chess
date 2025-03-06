@@ -16,17 +16,12 @@ public class ChessBoard implements Cloneable {
     public String toString() {
         StringBuilder boardString = new StringBuilder("|");
         for (int row = 8; row > 0; row--) {
-            for (int col = 1; col < 9; col++) {
-                if (getPiece(new ChessPosition(row, col)) == null) {
-                    boardString.append(" |");
-                } else {
-                    boardString.append(getPiece(new ChessPosition(row, col)).toString()).append("|");
-                }
-            }
+            toStringLoop(boardString, row);
             boardString.append("\n|");
         }
         return boardString.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -52,23 +47,37 @@ public class ChessBoard implements Cloneable {
         try {
             ChessBoard clone = (ChessBoard) super.clone();
             clone.squares = new ChessPiece[8][8];
-            cloneInnerLoops(clone);
+            cloneLoops(clone);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void cloneInnerLoops(ChessBoard clone) {
+    private void cloneLoops(ChessBoard clone) {
         for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
-                ChessPiece piece = this.getPiece(position);
-                if (piece == null) {
-                    clone.removePiece(position);
-                } else {
-                    clone.addPiece(position, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
-                }
+            innerLoop(clone, row);
+        }
+    }
+
+    private void innerLoop(ChessBoard clone, int row) {
+        for (int col = 1; col <= 8; col++) {
+            ChessPosition position = new ChessPosition(row, col);
+            ChessPiece piece = this.getPiece(position);
+            if (piece == null) {
+                clone.removePiece(position);
+            } else {
+                clone.addPiece(position, new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
+            }
+        }
+    }
+
+    private void toStringLoop(StringBuilder boardString, int row) {
+        for (int col = 1; col < 9; col++) {
+            if (getPiece(new ChessPosition(row, col)) == null) {
+                boardString.append(" |");
+            } else {
+                boardString.append(getPiece(new ChessPosition(row, col)).toString()).append("|");
             }
         }
     }
