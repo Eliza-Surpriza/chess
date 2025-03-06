@@ -23,9 +23,12 @@ public class ChessPiece {
             case PieceType.PAWN -> "P";
             case PieceType.ROOK -> "R";
         };
-        if(pieceColor == ChessGame.TeamColor.BLACK){letter = letter.toLowerCase();}
+        if (pieceColor == ChessGame.TeamColor.BLACK) {
+            letter = letter.toLowerCase();
+        }
         return letter;
     }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

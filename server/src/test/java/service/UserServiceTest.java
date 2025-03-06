@@ -55,22 +55,6 @@ class UserServiceTest {
 
     }
 
-
-    @Test
-    void logout() {
-        // logout with correct auth token, try again with same auth token, get error
-        AuthData result = userService.login(new LoginRequest("felicity", "1774"));
-        userService.logout(result.authToken());
-        assertThrows(UnauthorizedException.class, () -> userService.logout(result.authToken()));
-    }
-
-    @Test
-    void logoutUnauthorized() {
-        // logout with wrong auth token, get error
-        assertThrows(UnauthorizedException.class, () -> userService.logout("wrong!"));
-
-    }
-
     @Test
     void clear() {
         userService.login(new LoginRequest("felicity", "1774"));

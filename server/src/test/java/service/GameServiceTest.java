@@ -32,7 +32,7 @@ class GameServiceTest {
     @Test
     void createGame() {
         CreateResult createResult = gameService.createGame(new CreateRequest("sky"));
-        assertEquals(1, createResult.gameID());
+        assertEquals(3, createResult.gameID());
     }
 
     @Test

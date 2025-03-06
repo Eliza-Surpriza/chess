@@ -11,10 +11,6 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-//    AuthData createAuth(String username) {
-//        return authDAO.createAuth(username);
-//    }
-
     public void authorize(String authToken) throws UnauthorizedException {
         if ((authDAO.getAuth(authToken) == null)) {
             throw new UnauthorizedException("Error: unauthorized");

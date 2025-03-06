@@ -122,7 +122,9 @@ public class ChessGame implements Cloneable {
             doMove(move);
             if (currentTeam == TeamColor.WHITE) {
                 this.setTeamTurn(TeamColor.BLACK);
-            } else {this.setTeamTurn(TeamColor.WHITE);}
+            } else {
+                this.setTeamTurn(TeamColor.WHITE);
+            }
         } else {
             throw new InvalidMoveException();
         }
@@ -155,7 +157,8 @@ public class ChessGame implements Cloneable {
                     Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
                     for (ChessMove move : moves) {
                         // if it includes the square the king is on, return true
-                        if (gameBoard.getPiece(move.endPosition) != null && gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
+                        if (gameBoard.getPiece(move.endPosition) != null
+                                && gameBoard.getPiece(move.endPosition).getPieceType() == ChessPiece.PieceType.KING) {
                             return true;
                         }
                     }
@@ -178,7 +181,8 @@ public class ChessGame implements Cloneable {
                 for (int col = 1; col <= 8; col++) {
                     // for all my valid moves:
                     ChessPosition position = new ChessPosition(row, col);
-                    if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
+                    if (gameBoard.getPiece(position) != null
+                            && gameBoard.getPiece(position).getTeamColor() == teamColor) {
                         Collection<ChessMove> moves = gameBoard.getPiece(position).pieceMoves(gameBoard, position);
                         for (ChessMove move : moves) {
                             // deep copy the chess game
@@ -212,14 +216,18 @@ public class ChessGame implements Cloneable {
         // if get valid moves method returns not empty collection, return false
         // return true
         // how to check if a collection is empty: .isEmpty()
-        if (isInCheck(teamColor)) {return false;}
+        if (isInCheck(teamColor)) {
+            return false;
+        }
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 if (gameBoard.getPiece(position) != null && gameBoard.getPiece(position).getTeamColor() == teamColor) {
                     // for all their valid moves:
                     Collection<ChessMove> valid = validMoves(position);
-                    if (!valid.isEmpty()) {return false;}
+                    if (!valid.isEmpty()) {
+                        return false;
+                    }
                 }
             }
         }

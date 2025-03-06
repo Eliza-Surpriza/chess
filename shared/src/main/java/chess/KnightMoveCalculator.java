@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 
-public class KnightMoveCalculator extends PieceMoveCalculator{
+public class KnightMoveCalculator extends PieceMoveCalculator {
     public KnightMoveCalculator(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color) {
         super(board, myPosition, color);
     }
