@@ -28,6 +28,8 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::create);
         Spark.put("/game", this::join);
+        Spark.get("/game", this::list);
+        Spark.delete("/db", this::clear);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -80,6 +82,19 @@ public class Server {
         var partialJoinRequest = new Gson().fromJson(req.body(), JoinRequest.class);
         JoinRequest joinRequest = new JoinRequest(partialJoinRequest.playerColor(), partialJoinRequest.gameID(), authToken);
         gameService.joinGame(joinRequest);
+        return "";
+    }
+
+    private Object list(Request req, Response res) throws ResponseException {
+        var authToken = req.headers("authorization");
+        authService.authorize(authToken);
+        ListResult listResult = gameService.listGames();
+        return new Gson().toJson(listResult);
+    }
+
+    private Object clear(Request req, Response res) throws ResponseException {
+        userService.clear();
+        gameService.clear();
         return "";
     }
 }

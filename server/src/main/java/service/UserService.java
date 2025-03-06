@@ -43,4 +43,9 @@ public class UserService {
     public void logout(String logoutRequest) throws UnauthorizedException {
         authDAO.deleteAuth(logoutRequest);
     }
+
+    public void clear() {
+        userDAO.clearUsers();
+        authDAO.clearAuth();
+    }
 }

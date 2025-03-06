@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO {
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(nextId++, null, null, gameName, game);
 
-        games.put(gameData.GameID(), gameData);
+        games.put(gameData.gameID(), gameData);
         return gameData;
     }
 
@@ -31,7 +31,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public void updateGame(GameData gameData) {
-        games.put(gameData.GameID(), gameData);
+        games.put(gameData.gameID(), gameData);
     }
 
 }

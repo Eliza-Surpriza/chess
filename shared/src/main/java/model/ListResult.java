@@ -1,4 +1,4 @@
 package model;
 
-public record ListResult(GameData[] games) {
+public record ListResult(java.util.Collection<GameData> games) {
 }

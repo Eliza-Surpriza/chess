@@ -19,9 +19,6 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        // register username "felicity" password "1774"
-        // register user "samantha" password "1904"
-        // login user "samantha" password "1904"
         userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
     }
 
@@ -72,5 +69,12 @@ class UserServiceTest {
         // logout with wrong auth token, get error
         assertThrows(UnauthorizedException.class, () -> userService.logout("wrong!"));
 
+    }
+
+    @Test
+    void clear() {
+        userService.login(new LoginRequest("felicity", "1774"));
+        userService.clear();
+        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("felicity", "1774")));
     }
 }

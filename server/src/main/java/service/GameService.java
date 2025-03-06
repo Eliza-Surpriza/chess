@@ -2,13 +2,9 @@ package service;
 
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import exception.AlreadyTakenException;
 import exception.BadRequestException;
-import exception.UnauthorizedException;
 import model.*;
-
-import java.util.Objects;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -24,7 +20,7 @@ public class GameService {
             throw new BadRequestException("Error: bad request");
         }
         GameData gameData = gameDAO.createGame(createRequest.gameName());
-        return new CreateResult(gameData.GameID());
+        return new CreateResult(gameData.gameID());
     }
 
     public void joinGame(JoinRequest joinRequest) {
@@ -36,20 +32,28 @@ public class GameService {
         GameData newData;
         if (joinRequest.playerColor().equals("WHITE")) {
             if (gameData.whiteUsername() == null) {
-                newData = new GameData(gameData.GameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
+                newData = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
             } else {
-                throw new AlreadyTakenException("already taken");
+                throw new AlreadyTakenException("Error: already taken");
             }
         } else if (joinRequest.playerColor().equals("BLACK")) {
             if (gameData.blackUsername() == null) {
-                newData = new GameData(gameData.GameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
+                newData = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
             } else {
-                throw new AlreadyTakenException("already taken");
+                throw new AlreadyTakenException("Error: already taken");
             }
         } else {
             throw new BadRequestException("Error: bad request");
         }
         gameDAO.updateGame(newData);
+    }
+
+    public ListResult listGames() {
+        return new ListResult(gameDAO.listGames());
+    }
+
+    public void clear() {
+        gameDAO.clearGames();
     }
 
 
