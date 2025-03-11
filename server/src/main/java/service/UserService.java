@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import exception.AlreadyTakenException;
 import exception.BadRequestException;
@@ -21,7 +22,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public AuthData register(UserData registerRequest) throws AlreadyTakenException {
+    public AuthData register(UserData registerRequest) throws AlreadyTakenException, DataAccessException {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             throw new BadRequestException("Error: bad request");
         }

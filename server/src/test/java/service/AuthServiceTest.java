@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import exception.UnauthorizedException;
@@ -19,7 +20,7 @@ class AuthServiceTest {
 
 
     @Test
-    void authorize() {
+    void authorize() throws DataAccessException {
         userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
         AuthData result = userService.login(new LoginRequest("felicity", "1774"));
         userService.clear();
