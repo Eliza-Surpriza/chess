@@ -1,13 +1,12 @@
 package service;
 
-import dataaccess.DataAccessException;
+import exception.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import exception.UnauthorizedException;
 import model.AuthData;
 import model.LoginRequest;
 import model.UserData;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

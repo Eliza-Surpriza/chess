@@ -1,5 +1,7 @@
 package dataaccess;
 
+import exception.DataAccessException;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -29,7 +31,7 @@ public class DatabaseManager {
                 CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
+            throw new DataAccessException("unable to process db.properties. " + ex.getMessage());
         }
     }
 

@@ -1,5 +1,7 @@
 package dataaccess;
 
+import exception.DataAccessException;
+
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -55,8 +57,7 @@ public class SQLDAO {
                 }
             }
         } catch (DataAccessException ex) {
-            throw new DataAccessException(ex.message);
+            throw new DataAccessException(ex.getMessage());
         }
     }
-
 }

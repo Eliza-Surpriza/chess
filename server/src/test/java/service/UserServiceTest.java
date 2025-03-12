@@ -1,5 +1,6 @@
 package service;
 
+import exception.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import exception.AlreadyTakenException;
@@ -18,12 +19,12 @@ class UserServiceTest {
     UserService userService = new UserService(userDAO, authDAO);
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws DataAccessException {
         userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
     }
 
     @Test
-    void register() {
+    void register() throws DataAccessException {
         // register with username "kit" password "1934" email "mkittredge@gmail.com"
         AuthData result = userService.register(new UserData("kit", "1934", "robinhood@gmail.com"));
         assertEquals("kit", result.username());

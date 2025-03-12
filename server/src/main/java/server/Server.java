@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import exception.DataAccessException;
 import exception.ResponseException;
 import model.*;
 import service.AuthService;
