@@ -14,7 +14,7 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
     }
 
     public AuthData createAuth(String username) {
-        var statement = "INSERT INTO tokens (authToken, authData) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO tokens (authToken, authData) VALUES (?, ?)";
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
         var json = new Gson().toJson(authData);

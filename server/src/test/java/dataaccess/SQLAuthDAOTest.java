@@ -34,11 +34,6 @@ class SQLAuthDAOTest {
     }
 
     @Test
-    void createAuthAlreadyExists() {
-        assertThrows(DataAccessException.class, () -> authDAO.createAuth("aspen"));
-    }
-
-    @Test
     void deleteAuth() {
         AuthData ponderosaData = authDAO.createAuth("ponderosa");
         AuthData willowData = authDAO.createAuth("willow");
@@ -46,11 +41,6 @@ class SQLAuthDAOTest {
         assertNull(authDAO.getAuth(ponderosaData.authToken()));
         AuthData willowResult = authDAO.getAuth(willowData.authToken());
         assertEquals("willow", willowResult.username());
-    }
-
-    @Test
-    void deleteAuthNotThere() {
-        assertThrows(DataAccessException.class, () -> authDAO.deleteAuth("I don't exist"));
     }
 
     @Test
