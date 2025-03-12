@@ -35,6 +35,11 @@ public class SQLDAO {
         }
     }
 
+    void clearTable(String table) {
+        var statement = "TRUNCATE " + table;
+        executeUpdate(statement);
+    }
+
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  users (

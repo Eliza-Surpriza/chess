@@ -1,9 +1,11 @@
 package dataaccess;
 
+import model.LoginRequest;
 import model.UserData;
 
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MemoryUserDAO implements UserDAO {
     final private HashMap<String, UserData> users = new HashMap<>();
@@ -20,5 +22,8 @@ public class MemoryUserDAO implements UserDAO {
         users.clear();
     }
 
+    public boolean verifyPassword(UserData userData, LoginRequest loginRequest) {
+        return !Objects.equals(userData.password(), loginRequest.password());
+    }
 
 }

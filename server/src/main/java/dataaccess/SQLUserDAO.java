@@ -1,6 +1,7 @@
 package dataaccess;
 
 import exception.DataAccessException;
+import model.LoginRequest;
 import model.UserData;
 
 import java.sql.PreparedStatement;
@@ -14,12 +15,12 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
 
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+        // hash the password!!! :)
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
     public void clearUsers() {
-        var statement = "TRUNCATE users";
-        executeUpdate(statement);
+        clearTable("users");
     }
 
     public UserData getUser(String username) {
@@ -49,6 +50,13 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
         var password = rs.getString("password");
         var email = rs.getString("email");
         return new UserData(username, password, email);
+    }
+
+    public boolean verifyPassword(UserData userData, LoginRequest loginRequest) {
+        String plainPassword = loginRequest.password();
+        String hashedPassword = userData.password();
+        // check slides to see how to compare these:)
+        return true;
     }
 
 }

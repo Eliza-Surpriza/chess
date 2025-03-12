@@ -3,7 +3,6 @@ package dataaccess;
 import com.google.gson.Gson;
 import exception.DataAccessException;
 import model.AuthData;
-import model.UserData;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,12 +26,13 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
         return UUID.randomUUID().toString();
     }
 
-    public void deleteAuth(String authData) {
-
+    public void deleteAuth(String authToken) {
+        var statement = "DELETE FROM tokens WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
 
     public void clearAuth() {
-
+        clearTable("tokens");
     }
 
     public AuthData getAuth(String authToken) {

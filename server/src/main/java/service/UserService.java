@@ -35,7 +35,7 @@ public class UserService {
 
     public AuthData login(LoginRequest loginRequest) throws UnauthorizedException {
         UserData userData = userDAO.getUser(loginRequest.username());
-        if (userData == null || !Objects.equals(userData.password(), loginRequest.password())) {
+        if (userData == null || !userDAO.verifyPassword(userData, loginRequest)) {
             throw new UnauthorizedException("Error: unauthorized"); // error code 401
         }
         return authDAO.createAuth(loginRequest.username());
