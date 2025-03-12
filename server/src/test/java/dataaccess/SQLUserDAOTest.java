@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import exception.DataAccessException;
 import exception.UnauthorizedException;
 import model.UserData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,12 @@ public class SQLUserDAOTest {
     void setUp() {
         UserData userData = new UserData("cello", "dad", "practice");
         userDAO.createUser(userData);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        // clear!
+        userDAO.clearUsers();
     }
 
     @Test
@@ -38,5 +45,12 @@ public class SQLUserDAOTest {
     void getUserNotThere() {
         UserData result = userDAO.getUser("I don't exist");
         assertNull(result);
+    }
+
+    @Test
+    void getUser() {
+        UserData result = userDAO.getUser("cello");
+        UserData expected = new UserData("cello", "dad", "practice");
+        assertEquals(expected, result);
     }
 }

@@ -45,6 +45,14 @@ public class SQLDAO {
               INDEX(password),
               INDEX(email)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  tokens (
+              `authToken` varchar(256) NOT NULL,
+              `authData` varchar(256) NOT NULL,
+              PRIMARY KEY (`authToken`),
+              INDEX(authData),
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
 
