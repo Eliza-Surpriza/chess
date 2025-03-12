@@ -8,7 +8,7 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class SQLDAO {
-    public SQLDAO() throws SQLException, DataAccessException {
+    public SQLDAO() {
         configureDatabase();
     }
 
@@ -58,12 +58,26 @@ public class SQLDAO {
               PRIMARY KEY (`authToken`),
               INDEX(authData)
             )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS  games (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `whiteUsername` varchar(256) NOT NULL,
+              `blackUsername` varchar(256) NOT NULL,
+              `gameName` varchar(256) NOT NULL,
+              `game` varchar(2000) NOT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(whiteUsername),
+              INDEX(blackUsername),
+              INDEX(gameName),
+              INDEX(game)
+            )
             """
     };
 
     //ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
-    private void configureDatabase() throws DataAccessException, SQLException {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
@@ -71,7 +85,7 @@ public class SQLDAO {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (DataAccessException ex) {
+        } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException(ex.getMessage());
         }
     }

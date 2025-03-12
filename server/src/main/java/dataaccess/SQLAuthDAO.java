@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class SQLAuthDAO extends SQLDAO implements AuthDAO {
-    public SQLAuthDAO() throws SQLException, DataAccessException {
+    public SQLAuthDAO()  {
     }
 
     public AuthData createAuth(String username) {

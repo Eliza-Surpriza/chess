@@ -23,7 +23,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public boolean verifyPassword(UserData userData, LoginRequest loginRequest) {
-        return !Objects.equals(userData.password(), loginRequest.password());
+        return Objects.equals(userData.password(), loginRequest.password());
     }
 
 }

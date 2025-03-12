@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import exception.DataAccessException;
 import exception.UnauthorizedException;
+import model.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,5 +53,19 @@ public class SQLUserDAOTest {
         UserData result = userDAO.getUser("cello");
         UserData expected = new UserData("cello", "dad", "practice");
         assertEquals(expected, result);
+    }
+
+    @Test
+    void verifyPassword() {
+        UserData celloData = userDAO.getUser("cello");
+        LoginRequest request = new LoginRequest("cello", "dad");
+        assertTrue(userDAO.verifyPassword(celloData, request));
+    }
+
+    @Test
+    void verifyPasswordWrong() {
+        UserData celloData = userDAO.getUser("cello");
+        LoginRequest request = new LoginRequest("cello", "wrong password");
+        assertFalse(userDAO.verifyPassword(celloData, request));
     }
 }

@@ -1,26 +1,34 @@
 package service;
 
+import dataaccess.*;
 import exception.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
 import exception.AlreadyTakenException;
 import exception.UnauthorizedException;
 import model.AuthData;
 import model.LoginRequest;
 import model.UserData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    MemoryUserDAO userDAO = new MemoryUserDAO();
+    AuthDAO authDAO = new SQLAuthDAO();
+    UserDAO userDAO = new SQLUserDAO();
     UserService userService = new UserService(userDAO, authDAO);
+
 
     @BeforeEach
     void setUp() throws DataAccessException {
         userService.register(new UserData("felicity", "1774", "fmerriman@gmail.com"));
+    }
+
+    @AfterEach
+    void cleanUp() {
+        userService.clear();
     }
 
     @Test
