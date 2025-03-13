@@ -26,16 +26,13 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
 
     public UserData getUser(String username) {
         var statement = "SELECT username, password, email FROM users WHERE username=?";
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement)) {
-
+        try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
             ps.setString(1, username);
             return getUserFromResultSet(ps);
         } catch (SQLException e) {
             throw new DataAccessException("Unable to read data: " + e.getMessage());
         }
     }
-
 
     private UserData getUserFromResultSet(PreparedStatement ps) throws SQLException {
         try (var rs = ps.executeQuery()) {
