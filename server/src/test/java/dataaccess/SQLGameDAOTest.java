@@ -65,14 +65,15 @@ class SQLGameDAOTest {
     @Test
     void listGamesNoGames() {
         gameDAO.clearGames();
-//        Collection<GameData> expected = new ArrayList<GameData>();
-//        Collection<GameData> actual = gameDAO.listGames();
-//        assertEquals(new HashSet<>(expected), new HashSet<>(actual));
         assertEquals(new ArrayList<>(), gameDAO.listGames());
     }
 
     @Test
     void updateGame() {
+        GameData ponderosaII = new GameData(1, "patricia", null, "mariposa", new ChessGame());
+        gameDAO.updateGame(ponderosaII);
+        GameData result = gameDAO.getGame(1);
+        assertEquals(ponderosaII, result);
     }
 
     @Test

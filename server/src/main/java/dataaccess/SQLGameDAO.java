@@ -44,13 +44,9 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     private GameData readGame(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         var whiteUsername = rs.getString("whiteUsername");
-        if (Objects.equals(whiteUsername, "")) {
-            whiteUsername = null;
-        }
+        whiteUsername = Objects.equals(whiteUsername, "") ? null : whiteUsername;
         var blackUsername = rs.getString("blackUsername");
-        if (Objects.equals(blackUsername, "")) {
-            blackUsername = null;
-        }
+        blackUsername = Objects.equals(blackUsername, "") ? null : blackUsername;
         var gameName = rs.getString("gameName");
         var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);
@@ -72,8 +68,12 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
         return result;
     }
 
-    public void updateGame(GameData gameData) {
-        // hmm think about it for a bit
+    public void updateGame(GameData data) {
+        var statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE id = ?";
+        var json = new Gson().toJson(data.game());
+        String black = (data.blackUsername() == null) ? "" : data.blackUsername();
+        String white = (data.whiteUsername() == null) ? "" : data.whiteUsername();
+        executeUpdate(statement, white, black, data.gameName(), json, data.gameID());
     }
 
     public void clearGames() {
