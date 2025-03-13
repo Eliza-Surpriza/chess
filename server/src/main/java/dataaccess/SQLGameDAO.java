@@ -3,18 +3,17 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.DataAccessException;
-import model.AuthData;
 import model.GameData;
-import model.UserData;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 public class SQLGameDAO extends SQLDAO implements GameDAO {
+
     public GameData createGame(String gameName) {
         ChessGame game = new ChessGame();
         var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
@@ -45,9 +44,13 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     private GameData readGame(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         var whiteUsername = rs.getString("whiteUsername");
-        if (Objects.equals(whiteUsername, "")) whiteUsername = null;
+        if (Objects.equals(whiteUsername, "")) {
+            whiteUsername = null;
+        }
         var blackUsername = rs.getString("blackUsername");
-        if (Objects.equals(blackUsername, "")) blackUsername = null;
+        if (Objects.equals(blackUsername, "")) {
+            blackUsername = null;
+        }
         var gameName = rs.getString("gameName");
         var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);
@@ -55,8 +58,18 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     }
 
     public Collection<GameData> listGames() {
-        return List.of();
-        // copy from petshop
+        var result = new ArrayList<GameData>();
+        var statement = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(statement);
+             var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                result.add(readGame(rs));
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data: " + e.getMessage());
+        }
+        return result;
     }
 
     public void updateGame(GameData gameData) {
