@@ -17,14 +17,14 @@ import java.util.Objects;
 public class SQLGameDAO extends SQLDAO implements GameDAO {
     public GameData createGame(String gameName) {
         ChessGame game = new ChessGame();
-        var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, json) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(game);
         var id = executeUpdate(statement, "", "", gameName, json); // how to put null in here?
         return new GameData(id, null, null, gameName, game);
     }
 
     public GameData getGame(int id) {
-        var statement = "SELECT username, password, email FROM users WHERE username=?";
+        var statement = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games WHERE id=?";
         try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
             ps.setInt(1, id);
             return getGameFromResultSet(ps);
@@ -45,13 +45,9 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     private GameData readGame(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
         var whiteUsername = rs.getString("whiteUsername");
-        if (Objects.equals(whiteUsername, "")) {
-            whiteUsername = null;
-        }
+        if (Objects.equals(whiteUsername, "")) whiteUsername = null;
         var blackUsername = rs.getString("blackUsername");
-        if (Objects.equals(blackUsername, "")) {
-            blackUsername = null;
-        }
+        if (Objects.equals(blackUsername, "")) blackUsername = null;
         var gameName = rs.getString("gameName");
         var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);

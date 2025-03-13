@@ -67,10 +67,7 @@ public class SQLDAO {
               `gameName` varchar(256) NOT NULL,
               `game` varchar(2000) NOT NULL,
               PRIMARY KEY (`id`),
-              INDEX(whiteUsername),
-              INDEX(blackUsername),
-              INDEX(gameName),
-              INDEX(game)
+              INDEX(gameName)
             )
             """
     };

@@ -6,6 +6,8 @@ import exception.AlreadyTakenException;
 import exception.BadRequestException;
 import model.*;
 
+import java.util.Objects;
+
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
@@ -31,13 +33,13 @@ public class GameService {
         }
         GameData newData;
         if (joinRequest.playerColor().equals("WHITE")) {
-            if (gameData.whiteUsername() == null) {
+            if (Objects.equals(gameData.whiteUsername(), null)) {
                 newData = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
             } else {
                 throw new AlreadyTakenException("Error: already taken");
             }
         } else if (joinRequest.playerColor().equals("BLACK")) {
-            if (gameData.blackUsername() == null) {
+            if (Objects.equals(gameData.blackUsername(), null)) {
                 newData = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
             } else {
                 throw new AlreadyTakenException("Error: already taken");

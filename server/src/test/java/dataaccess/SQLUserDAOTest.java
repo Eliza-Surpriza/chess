@@ -14,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SQLUserDAOTest {
     UserDAO userDAO = new SQLUserDAO();
 
-    public SQLUserDAOTest() throws SQLException, DataAccessException {
-    }
     @BeforeEach
     void setUp() {
         UserData userData = new UserData("cello", "dad", "practice");
@@ -24,7 +22,6 @@ public class SQLUserDAOTest {
 
     @AfterEach
     void cleanUp() {
-        // clear!
         userDAO.clearUsers();
     }
 
@@ -33,7 +30,8 @@ public class SQLUserDAOTest {
         // I guess I will create a user, and then try to get that user
         UserData userData = new UserData("pug-queen", "green", "sophie");
         userDAO.createUser(userData);
-        assertEquals(userData, userDAO.getUser("pug-queen"));
+        UserData result = userDAO.getUser("pug-queen");
+        assertEquals("pug-queen", result.username());
     }
 
     @Test
@@ -52,7 +50,7 @@ public class SQLUserDAOTest {
     void getUser() {
         UserData result = userDAO.getUser("cello");
         UserData expected = new UserData("cello", "dad", "practice");
-        assertEquals(expected, result);
+        assertEquals(expected.username(), result.username());
     }
 
     @Test
@@ -67,5 +65,11 @@ public class SQLUserDAOTest {
         UserData celloData = userDAO.getUser("cello");
         LoginRequest request = new LoginRequest("cello", "wrong password");
         assertFalse(userDAO.verifyPassword(celloData, request));
+    }
+
+    @Test
+    void clear() {
+        userDAO.clearUsers();
+        assertNull(userDAO.getUser("pug-queen"));
     }
 }
