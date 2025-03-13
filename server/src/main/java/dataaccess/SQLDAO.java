@@ -16,10 +16,7 @@ public class SQLDAO {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             for (var i = 0; i < params.length; i++) {
-                var param = params[i];
-                if (param instanceof String p) ps.setString(i + 1, p);
-                else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                else if (param == null) ps.setNull(i + 1, NULL);
+                updateInnerLoop(ps, i, params);
             }
             ps.executeUpdate();
 
@@ -32,6 +29,17 @@ public class SQLDAO {
 
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    void updateInnerLoop(java.sql.PreparedStatement ps, int i, Object... params) throws SQLException {
+        var param = params[i];
+        switch (param) {
+            case String p -> ps.setString(i + 1, p);
+            case Integer p -> ps.setInt(i + 1, p);
+            case null -> ps.setNull(i + 1, NULL);
+            default -> {
+            }
         }
     }
 
