@@ -1,76 +1,96 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import chess.ChessGame;
+
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
+import static chess.ChessGame.TeamColor.WHITE;
+import static ui.EscapeSequences.*;
+
 public class DrawChessBoard {
-    /*
-     step 1. study tic tac toe
+    public static final String edgeColor = SET_BG_COLOR_BLUE;
 
-     receive a chess game object
-     also receive instructions on if I should do upside down or not
-     if we're not upside down:
-     first: the top: empty abcdefgh empty
-     then iterate through the rows 8 to 1
-     for (int i = 8; i >= 1; i--) {
-     draw row(i, chessboard) }
-     then draw bottom: empty abcdefgh empty
 
-     but if we are upside down:
-     top: empty hgfedcba empty
-     for (int i = 1; i <= 8; i++) {
-     draw row(i, chessboard) }
-     bottom: empty hgfedcba empty
-
-     except that for top, draw row is
-     for (int j = 1; j <= 8; j++) {
-         drawSquare(chessboard.getPiece(i,j));
-    }
-     and for bottom, draw row is:
-     for (int j = 8; j >= 1; j--) {
-     drawSquare(chessboard.getPiece(i,j));
+    public static void drawBoard(ChessBoard chessBoard, boolean upsideDown) {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        drawHeader(out, upsideDown);
+        if (upsideDown) {
+            upsideDownLoop(out, chessBoard);
+        } else {
+            rightSideUpLoop(out, chessBoard);
+        }
+        drawHeader(out, upsideDown);
     }
 
-     hmmmmmm wait can I do the same iteration but switch the i and j???
+    static void upsideDownLoop(PrintStream out, ChessBoard chessBoard) {
+        for (int i = 1; i <= 8; i++) {
+            String lineNum = " " + i + " ";
+            drawSquare(out, lineNum, edgeColor);
+            for (int j = 8; j >= 1; j--) {
+                boardSquare(i, j, chessBoard, out);
+            }
+            drawSquare(out, lineNum, edgeColor);
+            newLine(out);
+        }
+    }
 
-     ok main function:
-     do top separated by upsidedownness
-     for (int j = 8; j >= 1; j--) {
-         lineNum = i if normal, j if upside down (except I need to turn it into a string, not int)
-         drawSquare(lineNum, edgeColor);
-         for (int j = 1; j <= 8; j++) {
-             color is dark if i + j is even:) can you do mod in java? probably:) I feel very smart for figuring that out!!
-             else color is light
-             if upside down: drawSquare(chooseString(chessboard.getPiece(j,i)), color);
-             else: drawSquare(chooseString(chessboard.getPiece(i,j)), color);
-         }
-         drawSquare(lineNum, edgeColor);
-     }
-     do bottom separated by upsidedownness:)
+    static void rightSideUpLoop(PrintStream out, ChessBoard chessBoard) {
+        for (int i = 8; i >= 1; i--) {
+            String lineNum = " " + i + " ";
+            drawSquare(out, lineNum, edgeColor);
+            for (int j = 1; j <= 8; j++) {
+                boardSquare(i, j, chessBoard, out);
+            }
+            drawSquare(out, lineNum, edgeColor);
+            newLine(out);
+        }
+    }
 
-     ok how does drawSquare work?
-     I should actually just have it take a string and have a separate function find the string
+    static void boardSquare(int i, int j, ChessBoard chessBoard, PrintStream out) {
+        String color = ((i + j) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_WHITE;
+        ChessPosition position = new ChessPosition(i, j);
+        drawSquare(out, chooseString(chessBoard.getPiece(position)), color);
+    }
 
-     String chooseString(chessPiece) {
-         if chessPiece is null, return EMPTY
-         otherwise, do a switch:)
-         color = piece.color (idk)
-         character = switch chessPiece.pieceType:
-         case queen: WHITE QUEEN if color == WHITE else BLACK QUEEN
-         etc:)
-         return character:)
-     }
+    static void newLine(PrintStream out) {
+        out.print(RESET_BG_COLOR);
+        out.println();
+    }
 
-     void drawSquare(character, color) {
-        set background space to color
-        draw an empty space, then the character, then empty space
-     }
+    static String chooseString(ChessPiece chessPiece) {
+        if (chessPiece == null) {return EMPTY;}
+        ChessGame.TeamColor color = chessPiece.getTeamColor();
+        return switch (chessPiece.getPieceType()) {
+            case QUEEN -> (color == WHITE) ? WHITE_QUEEN : BLACK_QUEEN;
+            case KING -> (color == WHITE) ? WHITE_KING : BLACK_KING;
+            case BISHOP -> (color == WHITE) ? WHITE_BISHOP : BLACK_BISHOP;
+            case KNIGHT -> (color == WHITE) ? WHITE_KNIGHT : BLACK_KNIGHT;
+            case ROOK -> (color == WHITE) ? WHITE_ROOK : BLACK_ROOK;
+            case PAWN -> (color == WHITE) ? WHITE_PAWN : BLACK_PAWN;
+        };
+    }
 
-     void drawHeaderNormal(upside down?) {
-        drawSquare(empty, edgeColor);
-        if upside down: loop through h -> a
-        else: loop through a -> h
-        drawSquare(empty, edgeColor);
-     }
+    static void drawSquare(PrintStream out, String contents, String color) {
+        out.print(color);
+        out.print(contents);
+    }
 
-    */
+    static void drawHeader(PrintStream out, boolean upsideDown) {
+        drawSquare(out, EMPTY, edgeColor);
+        String[] letters = { " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h " };
+        if (upsideDown) {
+            letters = new String[]{ " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a " };
+        }
+        for (String letter : letters) {
+            drawSquare(out, letter, edgeColor);
+        }
+        drawSquare(out, EMPTY, edgeColor);
+        newLine(out);
+    }
 
 
 
