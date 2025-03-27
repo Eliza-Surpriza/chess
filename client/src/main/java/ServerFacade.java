@@ -26,21 +26,23 @@ public class ServerFacade {
         return gson.fromJson(json, AuthData.class);
     }
 
-    public String createGame(CreateRequest createRequest, String authToken) throws IOException {
+    public CreateResult createGame(CreateRequest createRequest, String authToken) throws IOException {
         String requestBody = gson.toJson(createRequest);
-        return communicator.doPost("/game", requestBody, authToken);
+        String json =  communicator.doPost("/game", requestBody, authToken);
+        return gson.fromJson(json, CreateResult.class);
     }
 
-    public String listGames(String authToken) throws IOException {
-        return communicator.doGet("/game", authToken);
+    public ListResult listGames(String authToken) throws IOException {
+        String json = communicator.doGet("/game", authToken);
+        return gson.fromJson(json, ListResult.class);
     }
 
     public String logout(String authToken) throws IOException {
         return communicator.doDelete("/session", authToken);
     }
 
-    public String clear() throws IOException {
-        return communicator.doDelete("/db", null);
+    public void clear() throws IOException {
+        communicator.doDelete("/db", null);
     }
 
     private String joinGame(JoinRequest joinRequest) throws IOException {
