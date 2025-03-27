@@ -50,7 +50,7 @@ public class Server {
     }
 
 
-    private Object register(Request req, Response res) throws ResponseException, DataAccessException {
+    private Object register(Request req, Response res) throws ResponseException {
         var userData = new Gson().fromJson(req.body(), UserData.class);
         AuthData authData = userService.register(userData);
         return new Gson().toJson(authData);

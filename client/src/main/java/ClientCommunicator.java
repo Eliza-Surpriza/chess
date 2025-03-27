@@ -3,76 +3,116 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import java.nio.charset.StandardCharsets;
 
 public class ClientCommunicator {
+    private final String serverUrl;
 
-    public void doGet(String urlString) throws IOException {
-        URL url = new URL(urlString);
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-        connection.setReadTimeout(5000);
-        connection.setRequestMethod("GET");
-
-        // Set HTTP request headers, if necessary
-        // connection.addRequestProperty("Accept", "text/html");
-        // connection.addRequestProperty("Authorization", "fjaklc8sdfjklakl");
-
-        connection.connect();
-
-        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            // Get HTTP response headers, if necessary
-            // Map<String, List<String>> headers = connection.getHeaderFields();
-
-            // OR
-
-            //connection.getHeaderField("Content-Length");
-
-            InputStream responseBody = connection.getInputStream();
-            // Read and process response body from InputStream ...
-        } else {
-            // SERVER RETURNED AN HTTP ERROR
-
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
-        }
+    public ClientCommunicator(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
-    public void doPost(String urlString) throws IOException {
-        URL url = new URL(urlString);
-
+    public String doPost(String endpoint, String jsonBody, String authToken) throws IOException {
+        URL url = new URL(serverUrl + endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-        connection.setReadTimeout(5000);
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/json");
 
-        // Set HTTP request headers, if necessary
-        // connection.addRequestProperty("Accept", "text/html");
+        if (authToken != null) {
+            connection.setRequestProperty("Authorization", authToken);
+        }
 
-        connection.connect();
-
-        try(OutputStream requestBody = connection.getOutputStream();) {
-            // Write request body to OutputStream ...
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
         }
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            // Get HTTP response headers, if necessary
-            // Map<String, List<String>> headers = connection.getHeaderFields();
+            return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        } else {
+            InputStream errorStream = connection.getErrorStream();
+            String errorMessage = errorStream != null
+                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
+                    : "Unknown error occurred.";
 
-            // OR
-
-            //connection.getHeaderField("Content-Length");
-
-            InputStream responseBody = connection.getInputStream();
-            // Read response body from InputStream ...
-        }
-        else {
-            // SERVER RETURNED AN HTTP ERROR
-
-            InputStream responseBody = connection.getErrorStream();
-            // Read and process error response body from InputStream ...
+            throw new IOException("Server error: " + errorMessage);
         }
     }
+
+
+    public String doGet(String endpoint, String authToken) throws IOException {
+        URL url = new URL(serverUrl + endpoint);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", "application/json");
+
+        if (authToken != null) {
+            connection.setRequestProperty("Authorization", authToken);
+        }
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        } else {
+            InputStream errorStream = connection.getErrorStream();
+            String errorMessage = errorStream != null
+                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
+                    : "Unknown error occurred.";
+
+            throw new IOException("Server error: " + errorMessage);
+        }
+    }
+
+    public String doDelete(String endpoint, String authToken) throws IOException {
+        URL url = new URL(serverUrl + endpoint);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", "application/json");
+
+        if (authToken != null) {
+            connection.setRequestProperty("Authorization", authToken);
+        }
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return "Success";
+        } else {
+            InputStream errorStream = connection.getErrorStream();
+            String errorMessage = errorStream != null
+                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
+                    : "Unknown error occurred.";
+
+            throw new IOException("Server error: " + errorMessage);
+        }
+    }
+
+    public String doPut(String endpoint, String jsonBody, String authToken) throws IOException {
+        URL url = new URL(serverUrl + endpoint);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        connection.setRequestProperty("Authorization", authToken);
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return "Success";
+        } else {
+            InputStream errorStream = connection.getErrorStream();
+            String errorMessage = errorStream != null
+                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
+                    : "Unknown error occurred.";
+
+            throw new IOException("Server error: " + errorMessage);
+        }
+    }
+
 }

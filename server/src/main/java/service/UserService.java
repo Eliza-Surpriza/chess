@@ -27,7 +27,7 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
         if (!(userDAO.getUser(registerRequest.username()) == null)) {
-            throw new AlreadyTakenException("Error: already taken"); // error code 403
+            throw new AlreadyTakenException("Error: already taken");
         }
         userDAO.createUser(registerRequest);
         return authDAO.createAuth(registerRequest.username());
@@ -36,7 +36,7 @@ public class UserService {
     public AuthData login(LoginRequest loginRequest) throws UnauthorizedException {
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData == null || !userDAO.verifyPassword(userData, loginRequest)) {
-            throw new UnauthorizedException("Error: unauthorized"); // error code 401
+            throw new UnauthorizedException("Error: unauthorized");
         }
         return authDAO.createAuth(loginRequest.username());
     }
