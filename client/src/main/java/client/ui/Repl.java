@@ -40,8 +40,4 @@ public class Repl {
         System.out.println();
     }
 
-//    private void printPrompt() {
-//        System.out.print("\n" + ">>> ");
-//    }
-
 }
