@@ -43,32 +43,32 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void Register() throws IOException {
+    public void register() throws IOException {
         AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
         assertEquals("reynie", authData.username());
     }
 
     @Test
-    public void RegisterAlreadyTaken() {
+    public void registerAlreadyTaken() {
         UserData userData = new UserData("kate-the-great", "weather", "weather@machine");
         assertThrows(IOException.class, () -> serverFacade.register(userData));
     }
 
     @Test
-    public void Login() throws IOException {
+    public void login() throws IOException {
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
         assertEquals("kate-the-great", authData.username());
     }
 
     @Test
-    public void LoginWrongPassword() {
+    public void loginWrongPassword() {
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "wrong_password");
         assertThrows(IOException.class, () -> serverFacade.login(loginRequest));
     }
 
     @Test
-    public void CreateGame() throws IOException {
+    public void createGame() throws IOException {
         CreateRequest createRequest = new CreateRequest("penguinWeek");
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
@@ -77,7 +77,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void CreateGameNoName() throws IOException {
+    public void createGameNoName() throws IOException {
         CreateRequest createRequest = new CreateRequest(null);
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
@@ -85,7 +85,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void ListGames() throws IOException {
+    public void listGames() throws IOException {
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
         ListResult listResult = serverFacade.listGames(authData.authToken());
@@ -96,12 +96,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void ListGamesUnauthorized() {
+    public void listGamesUnauthorized() {
         assertThrows(IOException.class, () -> serverFacade.listGames("unauthorized"));
     }
 
     @Test
-    public void Logout() throws IOException {
+    public void logout() throws IOException {
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
         serverFacade.logout(authData.authToken());
@@ -109,7 +109,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void LogoutUnauthorized() {
+    public void logoutUnauthorized() {
         assertThrows(IOException.class, () -> serverFacade.logout("unauthorized"));
     }
 
@@ -122,7 +122,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void JoinGame() throws IOException {
+    public void joinGame() throws IOException {
         AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
         serverFacade.joinGame(new JoinRequest("WHITE", 1, authData.authToken()));
         ListResult listResult = serverFacade.listGames(authData.authToken());
@@ -133,7 +133,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void JoinGameAlreadyTaken() throws IOException {
+    public void joinGameAlreadyTaken() throws IOException {
         AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
         assertThrows(IOException.class, () -> serverFacade.joinGame(new JoinRequest("BLACK", 1, authData.authToken())));
     }

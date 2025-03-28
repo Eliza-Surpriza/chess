@@ -98,14 +98,14 @@ public class LoggedInClient implements Client {
     }
 
     private GameData getGameFromFakeID(String fakeID) throws IOException {
-        int ID;
+        int id;
         try {
-            ID = Integer.parseInt(fakeID);
+            id = Integer.parseInt(fakeID);
         }
         catch (NumberFormatException e) {
             throw new IOException("Expected: join id color");
         }
-        return games.get(ID);
+        return games.get(id);
     }
 
     public String help() {
