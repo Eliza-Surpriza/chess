@@ -1,5 +1,4 @@
 import chess.ChessGame;
-import exception.AlreadyTakenException;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
