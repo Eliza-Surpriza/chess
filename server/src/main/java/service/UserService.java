@@ -24,10 +24,10 @@ public class UserService {
 
     public AuthData register(UserData registerRequest) throws AlreadyTakenException, DataAccessException {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
-            throw new BadRequestException("Expected: register username password email");
+            throw new BadRequestException("Error: Expected: register username password email");
         }
         if (!(userDAO.getUser(registerRequest.username()) == null)) {
-            throw new AlreadyTakenException("Username already taken. Try again.");
+            throw new AlreadyTakenException("Error: Username already taken. Try again.");
         }
         userDAO.createUser(registerRequest);
         return authDAO.createAuth(registerRequest.username());
@@ -36,7 +36,7 @@ public class UserService {
     public AuthData login(LoginRequest loginRequest) throws UnauthorizedException {
         UserData userData = userDAO.getUser(loginRequest.username());
         if (userData == null || !userDAO.verifyPassword(userData, loginRequest)) {
-            throw new UnauthorizedException("Wrong password or username. Try again");
+            throw new UnauthorizedException("Error: Wrong password or username. Try again");
         }
         return authDAO.createAuth(loginRequest.username());
     }

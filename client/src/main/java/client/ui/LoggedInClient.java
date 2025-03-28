@@ -62,6 +62,9 @@ public class LoggedInClient implements Client {
     public String join(String ... params) throws IOException {
         if (params.length == 2) {
             GameData gameData = getGameFromFakeID(params[0]);
+            if (gameData == null) {
+                throw new IOException("Game ID not valid. List games to see options.");
+            }
             String color;
             if (params[1].equalsIgnoreCase("white")) {
                 color = "WHITE";

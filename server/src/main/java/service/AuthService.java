@@ -13,7 +13,7 @@ public class AuthService {
 
     public void authorize(String authToken) throws UnauthorizedException {
         if ((authDAO.getAuth(authToken) == null)) {
-            throw new UnauthorizedException("Unauthorized. Login and try again.");
+            throw new UnauthorizedException("Error: Unauthorized. Login and try again.");
         }
     }
 }

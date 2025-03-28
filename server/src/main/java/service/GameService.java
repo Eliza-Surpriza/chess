@@ -26,17 +26,13 @@ public class GameService {
     }
 
     public void joinGame(JoinRequest joinRequest) {
-        try {
-            GameData gameData = gameDAO.getGame(joinRequest.gameID());
-            String username = authDAO.getAuth(joinRequest.authToken()).username();
-            if (joinRequest.playerColor() == null || joinRequest.authToken() == null || gameData == null) {
-                throw new BadRequestException("Expected: join id color");
-            }
-            GameData newData = addPlayer(joinRequest, username, gameData);
-            gameDAO.updateGame(newData);
-        } catch (Exception e) {
-            throw new BadRequestException("Expected: join id color");
+        GameData gameData = gameDAO.getGame(joinRequest.gameID());
+        String username = authDAO.getAuth(joinRequest.authToken()).username();
+        if (joinRequest.playerColor() == null || joinRequest.authToken() == null || gameData == null) {
+            throw new BadRequestException("Error: Expected: join id color");
         }
+        GameData newData = addPlayer(joinRequest, username, gameData);
+        gameDAO.updateGame(newData);
     }
 
     private GameData addPlayer(JoinRequest joinRequest, String username, GameData gameData) {
@@ -45,16 +41,16 @@ public class GameService {
             if (Objects.equals(gameData.whiteUsername(), null)) {
                 newData = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
             } else {
-                throw new AlreadyTakenException("white player is already claimed");
+                throw new AlreadyTakenException("Error: white player is already claimed");
             }
         } else if (joinRequest.playerColor().equals("BLACK")) {
             if (Objects.equals(gameData.blackUsername(), null)) {
                 newData = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
             } else {
-                throw new AlreadyTakenException("black player is already claimed");
+                throw new AlreadyTakenException("Error: black player is already claimed");
             }
         } else {
-            throw new BadRequestException("Expected: join id color (color options are \"white\" or \"black\")");
+            throw new BadRequestException("Error: Expected: join id color (color options are \"white\" or \"black\")");
         }
         return newData;
     }
