@@ -85,7 +85,7 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
         AuthData authData = serverFacade.login(loginRequest);
         ListResult listResult = serverFacade.listGames(authData.authToken());
-        GameData watermelon = new GameData(1, null, null, "duck", new ChessGame());
+        GameData watermelon = new GameData(1, null, "kate-the-great", "duck", new ChessGame());
         Collection<GameData> expected = List.of(watermelon);
         Collection<GameData> actual = listResult.games();
         assertEquals(new HashSet<>(expected), new HashSet<>(actual));
@@ -117,5 +117,7 @@ public class ServerFacadeTests {
         AuthData authData = serverFacade.register(userData);
         assertEquals("kate-the-great", authData.username());
     }
+
+
 
 }
