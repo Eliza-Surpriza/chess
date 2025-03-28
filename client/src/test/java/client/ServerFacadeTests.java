@@ -111,13 +111,21 @@ public class ServerFacadeTests {
 
     @Test
     public void clear() throws IOException {
-        // clear, then check that registering kate is ok
         serverFacade.clear();
         UserData userData = new UserData("kate-the-great", "weather", "weather@machine");
         AuthData authData = serverFacade.register(userData);
         assertEquals("kate-the-great", authData.username());
     }
 
-
+    @Test
+    public void JoinGame() throws IOException {
+        AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
+        serverFacade.joinGame(new JoinRequest("WHITE", 1, authData.authToken()));
+        ListResult listResult = serverFacade.listGames(authData.authToken());
+        GameData watermelon = new GameData(1, "reynie", "kate-the-great", "duck", new ChessGame());
+        Collection<GameData> expected = List.of(watermelon);
+        Collection<GameData> actual = listResult.games();
+        assertEquals(new HashSet<>(expected), new HashSet<>(actual));
+    }
 
 }
