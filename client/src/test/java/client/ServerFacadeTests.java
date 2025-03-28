@@ -128,4 +128,10 @@ public class ServerFacadeTests {
         assertEquals(new HashSet<>(expected), new HashSet<>(actual));
     }
 
+    @Test
+    public void JoinGameAlreadyTaken() throws IOException {
+        AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
+        assertThrows(IOException.class, () -> serverFacade.joinGame(new JoinRequest("BLACK", 1, authData.authToken())));
+    }
+
 }
