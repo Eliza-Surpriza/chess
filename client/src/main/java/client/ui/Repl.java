@@ -1,5 +1,6 @@
 package client.ui;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Repl {
@@ -31,8 +32,8 @@ public class Repl {
             try {
                 result = client.eval(line);
                 System.out.print(result);
-            } catch (Throwable e) {
-                var msg = e.toString();
+            } catch (IOException e) {
+                var msg = e.getMessage();
                 System.out.print(msg);
             }
         }
