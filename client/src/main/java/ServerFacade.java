@@ -13,7 +13,7 @@ public class ServerFacade {
         this.communicator = new ClientCommunicator(serverUrl);
     }
 
-    public AuthData registerUser(UserData userData) throws IOException {
+    public AuthData register(UserData userData) throws IOException {
         String requestBody = gson.toJson(userData);
         String json =  communicator.doPost("/user", requestBody, null);
         return gson.fromJson(json, AuthData.class);
@@ -45,7 +45,7 @@ public class ServerFacade {
         communicator.doDelete("/db", null);
     }
 
-    private String joinGame(JoinRequest joinRequest) throws IOException {
+    public String joinGame(JoinRequest joinRequest) throws IOException {
         String requestBody = gson.toJson(joinRequest);
         return communicator.doPut("/game", requestBody, joinRequest.authToken());
     }

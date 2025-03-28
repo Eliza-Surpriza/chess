@@ -1,7 +1,15 @@
+import chess.ChessGame;
+import exception.AlreadyTakenException;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -14,7 +22,7 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade(0);
+        serverFacade = new ServerFacade(port);
     }
 
     @AfterAll
@@ -25,50 +33,89 @@ public class ServerFacadeTests {
     @BeforeEach
     public void setUp() throws IOException {
         serverFacade.clear();
-        // register someone
-        // create game
+        AuthData authData = serverFacade.register(new UserData("kate-the-great", "weather", "weather@machine"));
+        CreateResult createResult = serverFacade.createGame(new CreateRequest("duck"), authData.authToken());
+        serverFacade.joinGame(new JoinRequest("BLACK", createResult.gameID(), authData.authToken()));
     }
 
     @Test
-    public void Register() {
-        // try registering
-        // see if it returns authdata
+    public void Register() throws IOException {
+        AuthData authData = serverFacade.register(new UserData("reynie", "tamil", "reynard@muldoon"));
+        assertEquals("reynie", authData.username());
     }
 
     @Test
     public void RegisterAlreadyTaken() {
-        // try registering with repeat info
-        // see if it throws IOException
+        UserData userData = new UserData("kate-the-great", "weather", "weather@machine");
+        assertThrows(IOException.class, () -> serverFacade.register(userData));
     }
 
     @Test
-    public void Login() {
-        // try login someone
-        // see if it gives an authtoken (check if it is longish?)
+    public void Login() throws IOException {
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
+        AuthData authData = serverFacade.login(loginRequest);
+        assertEquals("kate-the-great", authData.username());
     }
 
     @Test
     public void LoginWrongPassword() {
-        // try login someone wrong password
-        // see if error
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "wrong_password");
+        assertThrows(IOException.class, () -> serverFacade.login(loginRequest));
     }
 
     @Test
-    public void CreateGame() {
-        // try create game
-        // see if returns game data json
+    public void CreateGame() throws IOException {
+        CreateRequest createRequest = new CreateRequest("penguinWeek");
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
+        AuthData authData = serverFacade.login(loginRequest);
+        CreateResult createResult = serverFacade.createGame(createRequest, authData.authToken());
+        assertTrue(createResult.gameID() > 0);
     }
 
     @Test
-    public void CreateGameNoName() {
-        // try create game with no name
-        // see if error
+    public void CreateGameNoName() throws IOException {
+        CreateRequest createRequest = new CreateRequest(null);
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
+        AuthData authData = serverFacade.login(loginRequest);
+        assertThrows(IOException.class, () -> serverFacade.createGame(createRequest, authData.authToken()));
     }
 
     @Test
-    public void ListGames() {
-        // try list games
-        // see if is list of game:)
+    public void ListGames() throws IOException {
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
+        AuthData authData = serverFacade.login(loginRequest);
+        ListResult listResult = serverFacade.listGames(authData.authToken());
+        GameData watermelon = new GameData(1, null, null, "duck", new ChessGame());
+        Collection<GameData> expected = List.of(watermelon);
+        Collection<GameData> actual = listResult.games();
+        assertEquals(new HashSet<>(expected), new HashSet<>(actual));
+    }
+
+    @Test
+    public void ListGamesUnauthorized() {
+        assertThrows(IOException.class, () -> serverFacade.listGames("unauthorized"));
+    }
+
+    @Test
+    public void Logout() throws IOException {
+        LoginRequest loginRequest = new LoginRequest("kate-the-great", "weather");
+        AuthData authData = serverFacade.login(loginRequest);
+        serverFacade.logout(authData.authToken());
+        assertThrows(IOException.class, () -> serverFacade.listGames(authData.authToken()));
+    }
+
+    @Test
+    public void LogoutUnauthorized() {
+        assertThrows(IOException.class, () -> serverFacade.logout("unauthorized"));
+    }
+
+    @Test
+    public void clear() throws IOException {
+        // clear, then check that registering kate is ok
+        serverFacade.clear();
+        UserData userData = new UserData("kate-the-great", "weather", "weather@machine");
+        AuthData authData = serverFacade.register(userData);
+        assertEquals("kate-the-great", authData.username());
     }
 
 }

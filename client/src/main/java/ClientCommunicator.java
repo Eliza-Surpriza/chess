@@ -69,7 +69,7 @@ public class ClientCommunicator {
         URL url = new URL(serverUrl + endpoint);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-        connection.setRequestMethod("GET");
+        connection.setRequestMethod("DELETE");
         connection.setRequestProperty("Accept", "application/json");
 
         if (authToken != null) {
