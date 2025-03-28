@@ -1,5 +1,6 @@
+package client;
+
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import model.*;
 
 import java.io.IOException;
@@ -8,8 +9,7 @@ public class ServerFacade {
     private final ClientCommunicator communicator;
     private final Gson gson = new Gson();
 
-    public ServerFacade(int port) {
-        String serverUrl = "http://localhost:" + port + '/';
+    public ServerFacade(String serverUrl) {
         this.communicator = new ClientCommunicator(serverUrl);
     }
 

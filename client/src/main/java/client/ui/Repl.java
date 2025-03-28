@@ -1,20 +1,20 @@
-package ui;
+package client.ui;
 
 import java.util.Scanner;
-
-import static ui.EscapeSequences.*;
 
 public class Repl {
     private Client client;
     public boolean isLoggedIn;
     private final Client preLogin;
     private final Client loggedIn;
+    public String authToken;
 
     public Repl(String serverUrl) {
         preLogin = new PreLoginClient(serverUrl, this);
         loggedIn = new LoggedInClient(serverUrl, this);
         client = preLogin;
         isLoggedIn = false;
+        authToken = null;
     }
 
     public void run() {

@@ -1,4 +1,5 @@
 import chess.ChessGame;
+import client.ServerFacade;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -21,7 +22,8 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade(port);
+        String serverUrl = "http://localhost:" + port + '/';
+        serverFacade = new ServerFacade(serverUrl);
     }
 
     @AfterAll

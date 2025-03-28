@@ -1,5 +1,7 @@
+package client;
+
 import chess.*;
-import ui.DrawChessBoard;
+import client.ui.DrawChessBoard;
 
 public class Main {
     public static void main(String[] args) {

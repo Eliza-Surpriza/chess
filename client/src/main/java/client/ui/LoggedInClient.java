@@ -1,8 +1,7 @@
-package ui;
+package client.ui;
 
-public class PreLoginClient implements Client {
-
-    public PreLoginClient(String serverUrl, Repl repl) {
+public class LoggedInClient implements Client {
+    public LoggedInClient(String serverUrl, Repl repl) {
     }
 
     public String eval(String input) {

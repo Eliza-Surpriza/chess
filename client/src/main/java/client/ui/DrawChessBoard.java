@@ -1,4 +1,4 @@
-package ui;
+package client.ui;
 
 import chess.ChessBoard;
 import chess.ChessPiece;
@@ -9,7 +9,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static chess.ChessGame.TeamColor.WHITE;
-import static ui.EscapeSequences.*;
+import static client.ui.EscapeSequences.*;
 
 public class DrawChessBoard {
     public static final String edgeColor = SET_BG_COLOR_BLUE;
