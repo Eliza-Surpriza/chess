@@ -57,7 +57,10 @@ public class GamePlayClient implements Client{
 
     private ChessPosition readPosition(String position) throws IOException {
         try {
-            int row = position.charAt(1);
+            int row = Character.getNumericValue(position.charAt(1));
+            if (row < 1 || row > 8) {
+                throw new IOException("write chess position as \"b4\" or \"e8\"");
+            }
             int col = switch(position.charAt(0)) {
                 case 'a' -> 1;
                 case 'b' -> 2;

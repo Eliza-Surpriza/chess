@@ -54,7 +54,7 @@ public class DrawChessBoard {
 
     static void boardSquare(int i, int j, ChessBoard chessBoard, PrintStream out) {
         String color = ((i + j) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_WHITE;
-        if (i == moveFrom.getRow() && j == moveFrom.getColumn()) {
+        if (moveFrom != null && i == moveFrom.getRow() && j == moveFrom.getColumn()) {
             color = SET_BG_COLOR_MAGENTA;
         }
         if (inCollection(i, j, moveTo)) {
