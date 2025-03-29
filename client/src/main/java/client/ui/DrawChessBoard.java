@@ -1,21 +1,21 @@
 package client.ui;
 
-import chess.ChessBoard;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import chess.ChessGame;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static client.ui.EscapeSequences.*;
 
 public class DrawChessBoard {
     public static final String edgeColor = SET_BG_COLOR_BLUE;
+    private static Collection<ChessMove> toHighlight;
 
 
-    public static void drawBoard(ChessBoard chessBoard, boolean upsideDown) {
+    public static void drawBoard(ChessBoard chessBoard, boolean upsideDown, Collection<ChessMove> toHighlight) {
+        DrawChessBoard.toHighlight = toHighlight;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         drawHeader(out, upsideDown);
         if (upsideDown) {
@@ -52,8 +52,20 @@ public class DrawChessBoard {
 
     static void boardSquare(int i, int j, ChessBoard chessBoard, PrintStream out) {
         String color = ((i + j) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_WHITE;
+        if (isInHighlight(i, j)) {
+            color = SET_BG_COLOR_MAGENTA;
+        }
         ChessPosition position = new ChessPosition(i, j);
         drawSquare(out, chooseString(chessBoard.getPiece(position)), color);
+    }
+
+    static boolean isInHighlight(int i, int j) {
+        for (ChessMove chessMove : toHighlight) {
+            if (chessMove.getEndPosition().getRow() == i && chessMove.getEndPosition().getColumn() == j) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static void newLine(PrintStream out) {
