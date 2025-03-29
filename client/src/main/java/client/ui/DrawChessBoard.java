@@ -11,11 +11,13 @@ import static client.ui.EscapeSequences.*;
 
 public class DrawChessBoard {
     public static final String edgeColor = SET_BG_COLOR_BLUE;
-    private static Collection<ChessMove> toHighlight;
+    private static ChessPosition moveFrom;
+    private static Collection<ChessMove> moveTo;
 
 
-    public static void drawBoard(ChessBoard chessBoard, boolean upsideDown, Collection<ChessMove> toHighlight) {
-        DrawChessBoard.toHighlight = toHighlight;
+    public static void drawBoard(ChessBoard chessBoard, boolean upsideDown, ChessPosition moveFrom, Collection<ChessMove> moveTo) {
+        DrawChessBoard.moveFrom = moveFrom;
+        DrawChessBoard.moveTo = moveTo;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         drawHeader(out, upsideDown);
         if (upsideDown) {
@@ -52,15 +54,21 @@ public class DrawChessBoard {
 
     static void boardSquare(int i, int j, ChessBoard chessBoard, PrintStream out) {
         String color = ((i + j) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_WHITE;
-        if (isInHighlight(i, j)) {
+        if (i == moveFrom.getRow() && j == moveFrom.getColumn()) {
             color = SET_BG_COLOR_MAGENTA;
+        }
+        if (inCollection(i, j, moveTo)) {
+            color = SET_BG_COLOR_GREEN;
         }
         ChessPosition position = new ChessPosition(i, j);
         drawSquare(out, chooseString(chessBoard.getPiece(position)), color);
     }
 
-    static boolean isInHighlight(int i, int j) {
-        for (ChessMove chessMove : toHighlight) {
+    static boolean inCollection(int i, int j, Collection<ChessMove> collection) {
+        if (collection == null) {
+            return false;
+        }
+        for (ChessMove chessMove : collection) {
             if (chessMove.getEndPosition().getRow() == i && chessMove.getEndPosition().getColumn() == j) {
                 return true;
             }

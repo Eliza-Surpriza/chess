@@ -1,9 +1,14 @@
 package client.ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.ServerFacade;
+import model.CreateRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 import static client.ui.DrawChessBoard.drawBoard;
@@ -25,19 +30,49 @@ public class GamePlayClient implements Client{
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "redraw" -> redraw();
+            case "redraw" -> redraw(null, null);
 //            case "leave" -> leave();
 //            case "move" -> move(params);
 //            case "resign" -> resign();
-//            case "highlight" -> highlight(params);
+            case "highlight" -> highlight(params);
             default -> help();
         };
     }
 
-    public String redraw() {
+    public String redraw(ChessPosition moveFrom, Collection<ChessMove> moveTo) {
         boolean upsideDown = (Objects.equals(repl.color, "BLACK"));
-        drawBoard(repl.gameData.game().gameBoard, upsideDown);
+        drawBoard(repl.gameData.game().gameBoard, upsideDown, moveFrom, moveTo);
         return "";
+    }
+
+    public String highlight(String ... params) throws IOException {
+        if (params.length == 1) {
+            ChessPosition chessPosition = readPosition(params[0]);
+            Collection<ChessMove> moveTo = repl.gameData.game().validMoves(chessPosition);
+            redraw(chessPosition, moveTo);
+            return "valid moves for " + params[0] + "\n";
+        }
+        throw new IOException("Expected: highlight b4 (or other position)");
+    }
+
+    private ChessPosition readPosition(String position) throws IOException {
+        try {
+            int row = position.charAt(1);
+            int col = switch(position.charAt(0)) {
+                case 'a' -> 1;
+                case 'b' -> 2;
+                case 'c' -> 3;
+                case 'd' -> 4;
+                case 'e' -> 5;
+                case 'f' -> 6;
+                case 'g' -> 7;
+                case 'h' -> 8;
+                default -> throw new IOException("write chess position as \"b4\" or \"e8\"");
+            };
+            return new ChessPosition(row, col);
+        } catch (Exception e) {
+            throw new IOException("write chess position as \"b4\" or \"e8\"");
+        }
     }
 
     public String help() {

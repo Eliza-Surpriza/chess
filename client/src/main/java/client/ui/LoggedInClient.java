@@ -80,7 +80,7 @@ public class LoggedInClient implements Client {
             server.joinGame(new JoinRequest(repl.color, gameData.gameID(), repl.authToken));
             repl.gameData = gameData;
             repl.isInGame = true;
-            drawBoard(gameData.game().getBoard(), upsideDown);
+            drawBoard(gameData.game().getBoard(), upsideDown, null, null);
             return "\nwelcome to " + gameData.gameName() + "! type help to continue\n";
         }
         throw new IOException("Expected: join id color");
@@ -89,7 +89,7 @@ public class LoggedInClient implements Client {
     public String observe(String ... params) throws IOException {
         if (params.length == 1) {
             GameData gameData = getGameFromFakeID(params[0]);
-            drawBoard(gameData.game().getBoard(), false);
+            drawBoard(gameData.game().getBoard(), false, null, null);
             repl.color = null;
             return "observing game " + gameData.gameName() + "\n";
         }
