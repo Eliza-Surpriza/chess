@@ -67,20 +67,21 @@ public class LoggedInClient implements Client {
             if (gameData == null) {
                 throw new IOException("Game ID not valid. List games to see options.");
             }
-            String color;
             boolean upsideDown;
             if (params[1].equalsIgnoreCase("white")) {
-                color = "WHITE";
+                repl.color = "WHITE";
                 upsideDown = false;
             } else if (params[1].equalsIgnoreCase("black")) {
-                color = "BLACK";
+                repl.color = "BLACK";
                 upsideDown = true;
             } else {
                 throw new IOException("Expected: join id color");
             }
-            server.joinGame(new JoinRequest(color, gameData.gameID(), repl.authToken));
+            server.joinGame(new JoinRequest(repl.color, gameData.gameID(), repl.authToken));
+            repl.gameData = gameData;
+            repl.isInGame = true;
             drawBoard(gameData.game().getBoard(), upsideDown);
-            return "joined game " + gameData.gameName() + "\n";
+            return "\nwelcome to " + gameData.gameName() + "! type help to continue\n";
         }
         throw new IOException("Expected: join id color");
     }
@@ -89,6 +90,7 @@ public class LoggedInClient implements Client {
         if (params.length == 1) {
             GameData gameData = getGameFromFakeID(params[0]);
             drawBoard(gameData.game().getBoard(), false);
+            repl.color = null;
             return "observing game " + gameData.gameName() + "\n";
         }
         throw new IOException("Expected: join id color");

@@ -1,5 +1,7 @@
 package client.ui;
 
+import model.GameData;
+
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -8,14 +10,22 @@ public class Repl {
     public boolean isLoggedIn;
     private final Client preLogin;
     private final Client loggedIn;
+    private final Client gamePlay;
     public String authToken;
+    public GameData gameData;
+    public boolean isInGame;
+    public String color;
 
     public Repl(String serverUrl) {
         preLogin = new PreLoginClient(serverUrl, this);
         loggedIn = new LoggedInClient(serverUrl, this);
+        gamePlay = new GamePlayClient(serverUrl, this);
         client = preLogin;
         isLoggedIn = false;
         authToken = null;
+        gameData = null;
+        isInGame = false;
+        color = null;
     }
 
     public void run() {
@@ -25,10 +35,9 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")) {
-            client = (isLoggedIn) ? loggedIn : preLogin;
+            client = (isLoggedIn) ? (isInGame) ? gamePlay : loggedIn : preLogin;
             System.out.print("\n" + ">>> ");
             String line = scanner.nextLine();
-
             try {
                 result = client.eval(line);
                 System.out.print(result);
