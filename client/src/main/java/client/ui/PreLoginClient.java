@@ -35,7 +35,7 @@ public class PreLoginClient implements Client {
             AuthData authData = server.register(userData);
             repl.authToken = authData.authToken();
             repl.isLoggedIn = true;
-            return "welcome," + authData.username() +"! type \"help\" to continue";
+            return "welcome, " + authData.username() +"! type \"help\" to continue";
         }
         throw new IOException("Expected: register username password email");
     }
@@ -46,9 +46,9 @@ public class PreLoginClient implements Client {
             AuthData authData = server.login(loginRequest);
             repl.authToken = authData.authToken();
             repl.isLoggedIn = true;
-            return "welcome," + authData.username() +"! type \"help\" to continue";
+            return "welcome, " + authData.username() +"! type \"help\" to continue";
         }
-        throw new IOException("Expected: register username password email");
+        throw new IOException("Expected: login username password");
     }
 
     public String help() {

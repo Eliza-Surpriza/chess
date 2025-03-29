@@ -29,7 +29,7 @@ public class LoggedInClient implements Client {
             case "list" -> list();
             case "join" -> join(params);
             case "observe" -> observe(params);
-            case "logout" -> logout(params);
+            case "logout" -> logout();
             case "quit" -> "quit";
             default -> help();
         };
@@ -49,10 +49,12 @@ public class LoggedInClient implements Client {
         StringBuilder gameList = new StringBuilder();
         int fakeID = 1;
         for(GameData game : listResult.games()){
+            String whitePlayer = (game.whiteUsername() == null) ? "available" : game.whiteUsername();
+            String blackPlayer = (game.blackUsername() == null) ? "available" : game.blackUsername();
             gameList.append(fakeID);
             gameList.append(": ").append(game.gameName());
-            gameList.append(", white player: ").append(game.whiteUsername());
-            gameList.append(", black player: ").append(game.blackUsername()).append("\n");
+            gameList.append(", white player: ").append(whitePlayer);
+            gameList.append(", black player: ").append(blackPlayer).append("\n");
             games.put(fakeID, game);
             fakeID++;
         }
@@ -66,16 +68,18 @@ public class LoggedInClient implements Client {
                 throw new IOException("Game ID not valid. List games to see options.");
             }
             String color;
+            boolean upsideDown;
             if (params[1].equalsIgnoreCase("white")) {
                 color = "WHITE";
-                drawBoard(gameData.game().getBoard(), false);
+                upsideDown = false;
             } else if (params[1].equalsIgnoreCase("black")) {
                 color = "BLACK";
-                drawBoard(gameData.game().getBoard(), true);
+                upsideDown = true;
             } else {
                 throw new IOException("Expected: join id color");
             }
             server.joinGame(new JoinRequest(color, gameData.gameID(), repl.authToken));
+            drawBoard(gameData.game().getBoard(), upsideDown);
             return "joined game " + gameData.gameName() + "\n";
         }
         throw new IOException("Expected: join id color");
@@ -90,7 +94,7 @@ public class LoggedInClient implements Client {
         throw new IOException("Expected: join id color");
     }
 
-    public String logout(String ... params) throws IOException {
+    public String logout() throws IOException {
         server.logout(repl.authToken);
         repl.authToken = null;
         repl.isLoggedIn = false;

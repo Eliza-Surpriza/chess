@@ -1,5 +1,9 @@
 package client;
 
+import com.google.gson.Gson;
+import model.ErrorResponse;
+import model.ListResult;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ClientCommunicator {
     private final String serverUrl;
+    private final Gson gson = new Gson();
 
     public ClientCommunicator(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -38,8 +43,8 @@ public class ClientCommunicator {
             String errorMessage = errorStream != null
                     ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
                     : "Unknown error occurred.";
-
-            throw new IOException("Server error: " + errorMessage);
+            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
+            throw new IOException(errorResponse.message());
         }
     }
 
@@ -62,8 +67,8 @@ public class ClientCommunicator {
             String errorMessage = errorStream != null
                     ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
                     : "Unknown error occurred.";
-
-            throw new IOException("Server error: " + errorMessage);
+            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
+            throw new IOException(errorResponse.message());
         }
     }
 
@@ -86,7 +91,8 @@ public class ClientCommunicator {
                     ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
                     : "Unknown error occurred.";
 
-            throw new IOException("Server error: " + errorMessage);
+            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
+            throw new IOException(errorResponse.message());
         }
     }
 
@@ -112,8 +118,8 @@ public class ClientCommunicator {
             String errorMessage = errorStream != null
                     ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
                     : "Unknown error occurred.";
-
-            throw new IOException("Server error: " + errorMessage);
+            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
+            throw new IOException(errorResponse.message());
         }
     }
 
