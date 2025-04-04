@@ -1,15 +1,14 @@
 package client.ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
 import model.CreateRequest;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 import static client.ui.DrawChessBoard.drawBoard;
 
@@ -22,7 +21,6 @@ public class GamePlayClient implements Client{
     public GamePlayClient(String serverUrl, Repl repl) {
         server = new ServerFacade(serverUrl);
         this.repl = repl;
-
     }
 
     public String eval(String input) throws IOException {
@@ -31,12 +29,60 @@ public class GamePlayClient implements Client{
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "redraw" -> redraw(null, null);
-//            case "leave" -> leave();
-//            case "move" -> move(params);
-//            case "resign" -> resign();
+            case "leave" -> leave();
+            case "move" -> move(params);
+            case "resign" -> resign();
             case "highlight" -> highlight(params);
             default -> help();
         };
+    }
+
+    public String move(String ... params) throws IOException {
+        if (params.length >= 2) {
+            ChessPosition startPosition = readPosition(params[0]);
+            ChessPosition endPosition = readPosition(params[1]);
+            ChessPiece.PieceType promoPiece = ((params.length == 3) ? getPieceFromString(params[2]) : null);
+            ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
+            try {
+                repl.gameData.game().makeMove(move);
+            } catch(chess.InvalidMoveException e) {
+                throw new IOException("Invalid move. Try highlighting valid moves.");
+            }
+            boolean inCheck = repl.gameData.game().isInCheck(ChessGame.TeamColor.valueOf(repl.color));
+            boolean inCheckmate = repl.gameData.game().isInCheckmate(ChessGame.TeamColor.valueOf(repl.color));
+            boolean inStalemate = repl.gameData.game().isInStalemate(ChessGame.TeamColor.valueOf(repl.color));
+            // use websocket to adjust game for everyone
+            // redraw board (maybe highlighted?) but also do this for everyone
+//            Collection<ChessMove> moveTo = Collection<>();
+//            redraw(startPosition, )
+
+            return "moving from " + params[0] + " to " + params[1];
+        }
+        throw new IOException("Expected: highlight b4 (or other position)");
+    }
+
+    public ChessPiece.PieceType getPieceFromString(String piece) throws IOException {
+        return switch(piece) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            default -> throw new IOException("Enter promotion piece in lowercase, like \"queen\"");
+        };
+    }
+
+    public String resign() {
+        // set other player to be the winner
+        // set the game to be over
+        // send message to others
+        return "resigning";
+    }
+
+    public String leave() {
+        repl.isInGame = false;
+        repl.gameData = null;
+        // add call to websocket to notify others
+        return "left game";
     }
 
     public String redraw(ChessPosition moveFrom, Collection<ChessMove> moveTo) {
