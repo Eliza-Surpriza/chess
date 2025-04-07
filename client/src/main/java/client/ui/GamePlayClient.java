@@ -38,6 +38,9 @@ public class GamePlayClient implements Client{
     }
 
     public String move(String ... params) throws IOException {
+        if (repl.color != repl.gameData.game().currentTeam) {
+            throw new IOException("wait for your turn");
+        }
         if (params.length >= 2) {
             ChessPosition startPosition = readPosition(params[0]);
             ChessPosition endPosition = readPosition(params[1]);
@@ -48,13 +51,13 @@ public class GamePlayClient implements Client{
             } catch(chess.InvalidMoveException e) {
                 throw new IOException("Invalid move. Try highlighting valid moves.");
             }
-            boolean inCheck = repl.gameData.game().isInCheck(ChessGame.TeamColor.valueOf(repl.color));
-            boolean inCheckmate = repl.gameData.game().isInCheckmate(ChessGame.TeamColor.valueOf(repl.color));
-            boolean inStalemate = repl.gameData.game().isInStalemate(ChessGame.TeamColor.valueOf(repl.color));
+            boolean inCheck = repl.gameData.game().isInCheck(repl.color);
+            boolean inCheckmate = repl.gameData.game().isInCheckmate(repl.color);
+            boolean inStalemate = repl.gameData.game().isInStalemate(repl.color);
             // use websocket to adjust game for everyone
             // redraw board (maybe highlighted?) but also do this for everyone
-//            Collection<ChessMove> moveTo = Collection<>();
-//            redraw(startPosition, )
+            Collection<ChessMove> moveTo = Collections.singletonList(move);
+            redraw(startPosition, moveTo);
 
             return "moving from " + params[0] + " to " + params[1];
         }
@@ -86,7 +89,7 @@ public class GamePlayClient implements Client{
     }
 
     public String redraw(ChessPosition moveFrom, Collection<ChessMove> moveTo) {
-        boolean upsideDown = (Objects.equals(repl.color, "BLACK"));
+        boolean upsideDown = (Objects.equals(repl.color, ChessGame.TeamColor.BLACK));
         drawBoard(repl.gameData.game().gameBoard, upsideDown, moveFrom, moveTo);
         return "";
     }

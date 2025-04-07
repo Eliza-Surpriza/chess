@@ -1,5 +1,6 @@
 package client.ui;
 
+import chess.ChessGame;
 import client.ServerFacade;
 import model.*;
 
@@ -68,16 +69,19 @@ public class LoggedInClient implements Client {
                 throw new IOException("Game ID not valid. List games to see options.");
             }
             boolean upsideDown;
+            String stringColor;
             if (params[1].equalsIgnoreCase("white")) {
-                repl.color = "WHITE";
+                repl.color = ChessGame.TeamColor.WHITE;
+                stringColor = "WHITE";
                 upsideDown = false;
             } else if (params[1].equalsIgnoreCase("black")) {
-                repl.color = "BLACK";
+                repl.color = ChessGame.TeamColor.BLACK;
+                stringColor = "BLACK";
                 upsideDown = true;
             } else {
                 throw new IOException("Expected: join id color");
             }
-            server.joinGame(new JoinRequest(repl.color, gameData.gameID(), repl.authToken));
+            server.joinGame(new JoinRequest(stringColor, gameData.gameID(), repl.authToken));
             repl.gameData = gameData;
             repl.isInGame = true;
             drawBoard(gameData.game().getBoard(), upsideDown, null, null);

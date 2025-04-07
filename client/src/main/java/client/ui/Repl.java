@@ -1,5 +1,6 @@
 package client.ui;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class Repl {
     public String authToken;
     public GameData gameData;
     public boolean isInGame;
-    public String color;
+    public ChessGame.TeamColor color;
 
     public Repl(String serverUrl) {
         preLogin = new PreLoginClient(serverUrl, this);
