@@ -6,11 +6,11 @@ import model.*;
 import java.io.IOException;
 
 public class ServerFacade {
-    private final ClientCommunicator communicator;
+    private final HttpCommunicator communicator;
     private final Gson gson = new Gson();
 
     public ServerFacade(String serverUrl) {
-        this.communicator = new ClientCommunicator(serverUrl);
+        this.communicator = new HttpCommunicator(serverUrl);
     }
 
     public AuthData register(UserData userData) throws IOException {

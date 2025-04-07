@@ -2,7 +2,6 @@ package client;
 
 import com.google.gson.Gson;
 import model.ErrorResponse;
-import model.ListResult;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,11 +10,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class ClientCommunicator {
+public class HttpCommunicator {
     private final String serverUrl;
     private final Gson gson = new Gson();
 
-    public ClientCommunicator(String serverUrl) {
+    public HttpCommunicator(String serverUrl) {
         this.serverUrl = serverUrl;
     }
 

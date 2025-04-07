@@ -1,12 +1,20 @@
 package client.ui;
 
 import chess.ChessGame;
+import client.ServerMessageObserver;
 import model.GameData;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Scanner;
 
-public class Repl {
+import static client.ui.DrawChessBoard.drawBoard;
+
+public class Repl implements ServerMessageObserver {
     private Client client;
     public boolean isLoggedIn;
     private final Client preLogin;
@@ -48,6 +56,31 @@ public class Repl {
             }
         }
         System.out.println();
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
+            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+        }
+    }
+
+    private void displayNotification(String message) {
+        System.out.print(message);
+        System.out.print("\n" + ">>> ");
+    }
+
+    private void displayError(String error) {
+        System.out.print(error);
+        System.out.print("\n" + ">>> ");
+    }
+
+    private void loadGame(ChessGame game) {
+        boolean upsideDown = (Objects.equals(color, ChessGame.TeamColor.BLACK));
+        drawBoard(game.gameBoard, upsideDown, null, null);
+        System.out.print("\n" + ">>> ");
     }
 
 }

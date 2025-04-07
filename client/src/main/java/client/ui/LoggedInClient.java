@@ -2,7 +2,9 @@ package client.ui;
 
 import chess.ChessGame;
 import client.ServerFacade;
+import client.ServerMessageObserver;
 import model.*;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -129,4 +131,6 @@ public class LoggedInClient implements Client {
                 - "help" (print this menu again)
                 """;
     }
+
+
 }

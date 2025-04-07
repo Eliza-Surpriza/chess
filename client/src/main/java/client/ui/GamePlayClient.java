@@ -5,14 +5,19 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
+import client.ServerMessageObserver;
 import model.CreateRequest;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.*;
 
 import static client.ui.DrawChessBoard.drawBoard;
 
-public class GamePlayClient implements Client{
+public class GamePlayClient implements Client {
 
     private final ServerFacade server;
     private final Repl repl;
@@ -137,4 +142,7 @@ public class GamePlayClient implements Client{
                 - "help" (print this menu again)
                 """;
     }
+
+
+
 }
