@@ -75,18 +75,20 @@ public class LoggedInClient implements Client {
             if (params[1].equalsIgnoreCase("white")) {
                 repl.color = ChessGame.TeamColor.WHITE;
                 stringColor = "WHITE";
-                upsideDown = false;
+//                upsideDown = false;
             } else if (params[1].equalsIgnoreCase("black")) {
                 repl.color = ChessGame.TeamColor.BLACK;
                 stringColor = "BLACK";
-                upsideDown = true;
+//                upsideDown = true;
             } else {
                 throw new IOException("Expected: join id color");
             }
             server.joinGame(new JoinRequest(stringColor, gameData.gameID(), repl.authToken));
+            server.connect(repl.authToken, gameData.gameID());
+            repl.game = gameData.game();
             repl.gameData = gameData;
             repl.isInGame = true;
-            drawBoard(gameData.game().getBoard(), upsideDown, null, null);
+//            drawBoard(gameData.game().getBoard(), upsideDown, null, null);
             return "\nwelcome to " + gameData.gameName() + "! type help to continue\n";
             // I think here is where we connect with the websocket.
             // and instead of drawing board myself, I can have the websocket tell me to and the repl will handle it
@@ -97,8 +99,11 @@ public class LoggedInClient implements Client {
     public String observe(String ... params) throws IOException {
         if (params.length == 1) {
             GameData gameData = getGameFromFakeID(params[0]);
-            drawBoard(gameData.game().getBoard(), false, null, null);
+//            drawBoard(gameData.game().getBoard(), false, null, null);
             repl.color = null;
+            repl.game = gameData.game();
+            repl.gameData = gameData;
+            server.connect(repl.authToken, gameData.gameID());
             return "observing game " + gameData.gameName() + "\n";
             // I think here is where we connect with the websocket.
             // and instead of drawing board myself, I can have the websocket tell me to and the repl will handle it

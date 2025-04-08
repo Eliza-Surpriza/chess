@@ -43,7 +43,7 @@ public class GamePlayClient implements Client {
     }
 
     public String move(String ... params) throws IOException {
-        if (repl.color != repl.gameData.game().currentTeam) {
+        if (repl.color != repl.game.currentTeam) {
             throw new IOException("wait for your turn");
         }
         if (params.length >= 2) {
@@ -51,7 +51,7 @@ public class GamePlayClient implements Client {
             ChessPosition endPosition = readPosition(params[1]);
             ChessPiece.PieceType promoPiece = ((params.length == 3) ? getPieceFromString(params[2]) : null);
             ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
-
+            server.makeMove(repl.authToken, repl.gameData.gameID(), move);
             // ok all of the following actually goes in the server lol
 //            try {
 //                repl.gameData.game().makeMove(move);
@@ -84,32 +84,33 @@ public class GamePlayClient implements Client {
         };
     }
 
-    public String resign() {
-        // check if player isn't an observer
-        // set other player to be the winner
-        // set the game to be over
-        // send message to others
+    public String resign() throws IOException {
+        if (repl.color == null) {
+            throw new IOException("Only players can resign. If you are done observing, type \"leave\"");
+        }
+        server.resign(repl.authToken, repl.gameData.gameID());
         return "resigning";
     }
 
-    public String leave() {
+    public String leave() throws IOException {
+        server.leave(repl.authToken, repl.gameData.gameID());
         repl.isInGame = false;
-        repl.gameData = null;
+        repl.game = null;
         // add call to websocket to notify others
-        // also in websocket set player to null
+        // also in websocket set player to null (make sure to check if player is observer)
         return "left game";
     }
 
     public String redraw(ChessPosition moveFrom, Collection<ChessMove> moveTo) {
         boolean upsideDown = (Objects.equals(repl.color, ChessGame.TeamColor.BLACK));
-        drawBoard(repl.gameData.game().gameBoard, upsideDown, moveFrom, moveTo);
+        drawBoard(repl.game.gameBoard, upsideDown, moveFrom, moveTo);
         return "";
     }
 
     public String highlight(String ... params) throws IOException {
         if (params.length == 1) {
             ChessPosition chessPosition = readPosition(params[0]);
-            Collection<ChessMove> moveTo = repl.gameData.game().validMoves(chessPosition);
+            Collection<ChessMove> moveTo = repl.game.validMoves(chessPosition);
             redraw(chessPosition, moveTo);
             return "valid moves for " + params[0] + "\n";
         }
