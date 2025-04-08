@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame implements Cloneable {
     public TeamColor currentTeam;
     public ChessBoard gameBoard;
+    public boolean gameOver;
 
     @Override
     public boolean equals(Object o) {
@@ -30,6 +31,7 @@ public class ChessGame implements Cloneable {
     public ChessGame() {
         this.currentTeam = TeamColor.WHITE;
         this.gameBoard = new ChessBoard();
+        this.gameOver = false;
         gameBoard.resetBoard();
     }
 
@@ -68,6 +70,10 @@ public class ChessGame implements Cloneable {
      */
     public void setTeamTurn(TeamColor team) {
         currentTeam = team;
+    }
+
+    public void endGame() {
+        gameOver = true;
     }
 
     /**
