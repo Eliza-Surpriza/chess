@@ -25,7 +25,7 @@ public class Repl implements ServerMessageObserver {
     public boolean isInGame;
     public ChessGame.TeamColor color;
 
-    public Repl(String serverUrl) {
+    public Repl(String serverUrl) throws IOException {
         preLogin = new PreLoginClient(serverUrl, this);
         loggedIn = new LoggedInClient(serverUrl, this);
         gamePlay = new GamePlayClient(serverUrl, this);

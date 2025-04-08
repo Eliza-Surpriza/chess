@@ -3,6 +3,7 @@ package client;
 
 import chess.ChessGame;
 import client.ServerFacade;
+import client.ui.Repl;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -19,14 +20,15 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
+    private static Repl repl;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws IOException {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         String serverUrl = "http://localhost:" + port + '/';
-        serverFacade = new ServerFacade(serverUrl);
+        serverFacade = new ServerFacade(serverUrl, repl);
     }
 
     @AfterAll

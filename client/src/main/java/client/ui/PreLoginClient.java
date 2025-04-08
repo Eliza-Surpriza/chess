@@ -12,8 +12,8 @@ public class PreLoginClient implements Client {
     private final Repl repl;
 
 
-    public PreLoginClient(String serverUrl, Repl repl) {
-        server = new ServerFacade(serverUrl);
+    public PreLoginClient(String serverUrl, Repl repl) throws IOException {
+        server = new ServerFacade(serverUrl, repl);
         this.repl = repl;
     }
 

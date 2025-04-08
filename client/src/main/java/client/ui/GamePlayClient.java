@@ -23,8 +23,8 @@ public class GamePlayClient implements Client {
     private final Repl repl;
 
 
-    public GamePlayClient(String serverUrl, Repl repl) {
-        server = new ServerFacade(serverUrl);
+    public GamePlayClient(String serverUrl, Repl repl) throws IOException {
+        server = new ServerFacade(serverUrl, repl);
         this.repl = repl;
     }
 
@@ -51,19 +51,24 @@ public class GamePlayClient implements Client {
             ChessPosition endPosition = readPosition(params[1]);
             ChessPiece.PieceType promoPiece = ((params.length == 3) ? getPieceFromString(params[2]) : null);
             ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
-            try {
-                repl.gameData.game().makeMove(move);
-            } catch(chess.InvalidMoveException e) {
-                throw new IOException("Invalid move. Try highlighting valid moves.");
-            }
-            boolean inCheck = repl.gameData.game().isInCheck(repl.color);
-            boolean inCheckmate = repl.gameData.game().isInCheckmate(repl.color);
-            boolean inStalemate = repl.gameData.game().isInStalemate(repl.color);
+
+            // ok all of the following actually goes in the server lol
+//            try {
+//                repl.gameData.game().makeMove(move);
+//            } catch(chess.InvalidMoveException e) {
+//                throw new IOException("Invalid move. Try highlighting valid moves.");
+//            }
+//            boolean inCheck = repl.gameData.game().isInCheck(repl.color);
+//            boolean inCheckmate = repl.gameData.game().isInCheckmate(repl.color);
+//            boolean inStalemate = repl.gameData.game().isInStalemate(repl.color);
             // use websocket to adjust game for everyone
             // redraw board (maybe highlighted?) but also do this for everyone
-            Collection<ChessMove> moveTo = Collections.singletonList(move);
-            redraw(startPosition, moveTo);
+            // golly I think I did a lot here that I was supposed to actually do in the websocket server.
+            // I think I'll give up on highlighting the squares for a move
 
+//            Collection<ChessMove> moveTo = Collections.singletonList(move);
+//            redraw(startPosition, moveTo);
+            // I think this also turns into a websocket message lol
             return "moving from " + params[0] + " to " + params[1];
         }
         throw new IOException("Expected: highlight b4 (or other position)");
@@ -80,6 +85,7 @@ public class GamePlayClient implements Client {
     }
 
     public String resign() {
+        // check if player isn't an observer
         // set other player to be the winner
         // set the game to be over
         // send message to others
@@ -90,6 +96,7 @@ public class GamePlayClient implements Client {
         repl.isInGame = false;
         repl.gameData = null;
         // add call to websocket to notify others
+        // also in websocket set player to null
         return "left game";
     }
 

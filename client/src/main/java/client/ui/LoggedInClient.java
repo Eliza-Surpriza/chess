@@ -17,8 +17,8 @@ public class LoggedInClient implements Client {
     private final Repl repl;
     private HashMap<Integer, GameData> games;
 
-    public LoggedInClient(String serverUrl, Repl repl) {
-        server = new ServerFacade(serverUrl);
+    public LoggedInClient(String serverUrl, Repl repl) throws IOException {
+        server = new ServerFacade(serverUrl, repl);
         this.repl = repl;
         games = new HashMap<>();
     }
@@ -88,6 +88,8 @@ public class LoggedInClient implements Client {
             repl.isInGame = true;
             drawBoard(gameData.game().getBoard(), upsideDown, null, null);
             return "\nwelcome to " + gameData.gameName() + "! type help to continue\n";
+            // I think here is where we connect with the websocket.
+            // and instead of drawing board myself, I can have the websocket tell me to and the repl will handle it
         }
         throw new IOException("Expected: join id color");
     }
@@ -98,6 +100,8 @@ public class LoggedInClient implements Client {
             drawBoard(gameData.game().getBoard(), false, null, null);
             repl.color = null;
             return "observing game " + gameData.gameName() + "\n";
+            // I think here is where we connect with the websocket.
+            // and instead of drawing board myself, I can have the websocket tell me to and the repl will handle it
         }
         throw new IOException("Expected: join id color");
     }
