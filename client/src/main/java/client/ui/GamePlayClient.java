@@ -132,7 +132,7 @@ public class GamePlayClient implements Client {
     public String help() {
         return """
                 - "redraw" (print chess board again)
-                - "move <start position> <end position> <promotion piece>" (make a move - only include promotion piece if moving pawn to edge of board)
+                - "move <start position> <end position> <promotion piece>" (make a move - promo for pawns at edge)
                 - "resign" (forfeit game)
                 - "highlight <position>" (highlight legal moves for a position)
                 - "leave" (leave game, return to previous menu)
