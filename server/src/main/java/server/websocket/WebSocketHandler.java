@@ -20,6 +20,7 @@ import websocket.commands.UserGameCommand;
 
 import com.google.gson.Gson;
 import websocket.messages.*;
+
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 import java.io.IOException;
@@ -93,11 +94,13 @@ public class WebSocketHandler {
             checkIfShouldMove(gameData, move, username);
             gameData.game().makeMove(move);
             ChessGame game = checkGameStatus(gameData, username);
-            GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            String white = gameData.whiteUsername();
+            String black = gameData.blackUsername();
+            GameData updated = new GameData(gameData.gameID(), white, black, gameData.gameName(), game);
             gameDAO.updateGame(updated);
             LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, updated);
             connections.broadcast(username, loadGameMessage, true);
-            String message = username + "moved from " + decipher(move.startPosition) + " to " + decipher(command.getMove().endPosition);
+            String message = username + "moved from " + decipher(move.startPosition) + " to " + decipher(move.endPosition);
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
             connections.broadcast(username, notificationMessage, false);
         } catch (InvalidMoveException e) {
@@ -125,7 +128,7 @@ public class WebSocketHandler {
     }
 
     public String decipher(ChessPosition position) {
-        String column = switch(position.getRow()) {
+        String column = switch (position.getRow()) {
             case (1) -> "a";
             case (2) -> "b";
             case (3) -> "c";
@@ -170,10 +173,12 @@ public class WebSocketHandler {
     public void leave(String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         GameData updated;
-        if (Objects.equals(gameData.whiteUsername(), username)) {
-            updated = new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game());
-        } else if (Objects.equals(gameData.blackUsername(), username)) {
-            updated = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+        String white = gameData.whiteUsername();
+        String black = gameData.blackUsername();
+        if (Objects.equals(white, username)) {
+            updated = new GameData(gameData.gameID(), null, black, gameData.gameName(), gameData.game());
+        } else if (Objects.equals(black, username)) {
+            updated = new GameData(gameData.gameID(), white, null, gameData.gameName(), gameData.game());
         } else {
             updated = gameData;
         }
@@ -189,11 +194,13 @@ public class WebSocketHandler {
         ChessGame game = gameData.game();
         if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
             connections.rootMessage(username, new ErrorMessage(ERROR, "Error: observers cannot resign"));
-        } else if (game.gameOver){
+        } else if (game.gameOver) {
             connections.rootMessage(username, new ErrorMessage(ERROR, "Error: game over"));
         } else {
             game.endGame();
-            GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            String white = gameData.whiteUsername();
+            String black = gameData.blackUsername();
+            GameData updated = new GameData(gameData.gameID(), white, black, gameData.gameName(), game);
             gameDAO.updateGame(updated);
             String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
             String message = username + " resigned." + winner + " wins!";
