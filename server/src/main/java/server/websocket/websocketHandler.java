@@ -29,6 +29,8 @@ public class websocketHandler  {
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
     private final Gson gson = new Gson();
+    private final ConnectionManager connections = new ConnectionManager();
+
 
     public websocketHandler (UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.userDAO = userDAO;
@@ -65,6 +67,8 @@ public class websocketHandler  {
 
     public void connect(Session session, String username, UserGameCommand command) {
         // um connect I guess? maybe I make a connections class like in petshop. idk.
+        connections.add(username, session);
+        // make a server message and send it!
     }
 
     public void makeMove(Session session, String username, MakeMoveCommand command) {
