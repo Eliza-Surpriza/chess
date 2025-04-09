@@ -116,7 +116,7 @@ public class ChessGame implements Cloneable {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = gameBoard.getPiece(move.startPosition);
         if (piece == null || piece.getTeamColor() != currentTeam) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Error: invalid move");
         }
         Collection<ChessMove> valid = validMoves(move.startPosition);
         if (valid.contains(move)) {

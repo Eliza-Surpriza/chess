@@ -1,8 +1,11 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPosition;
 import chess.InvalidMoveException;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapterFactory;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -31,7 +34,7 @@ public class WebSocketHandler {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
-    private final Gson gson = new Gson();
+    private final Gson gson;
     private final ConnectionManager connections = new ConnectionManager();
 
 
@@ -39,6 +42,7 @@ public class WebSocketHandler {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
+        this.gson = new Gson();
     }
 
     @OnWebSocketMessage
@@ -48,7 +52,7 @@ public class WebSocketHandler {
             String username = authDAO.getAuth(command.getAuthToken()).username();
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
-                case MAKE_MOVE -> makeMove(username, (MakeMoveCommand) command);
+                case MAKE_MOVE -> makeMove(username, gson.fromJson(message, MakeMoveCommand.class));
                 case LEAVE -> leave(username, command);
                 case RESIGN -> resign(username, command);
             }
@@ -57,7 +61,7 @@ public class WebSocketHandler {
             String json = gson.toJson(errorMessage);
             session.getRemote().sendString(json);
         } catch (Exception ex) {
-            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Unexpected Error");
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, ex.getMessage());
             String json = gson.toJson(errorMessage);
             session.getRemote().sendString(json);
         }
@@ -84,19 +88,36 @@ public class WebSocketHandler {
 
     public void makeMove(String username, MakeMoveCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
+        ChessMove move = command.getMove();
         try {
-            gameData.game().makeMove(command.getMove());
+            checkIfShouldMove(gameData, move, username);
+            gameData.game().makeMove(move);
             ChessGame game = checkGameStatus(gameData, username);
             GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
             gameDAO.updateGame(updated);
             LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, updated);
             connections.broadcast(username, loadGameMessage, true);
-            String message = username + "moved from " + decipherPosition(command.getMove().startPosition) + " to " + decipherPosition(command.getMove().endPosition);
+            String message = username + "moved from " + decipherPosition(move.startPosition) + " to " + decipherPosition(command.getMove().endPosition);
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
             connections.broadcast(username, notificationMessage, false);
         } catch (InvalidMoveException e) {
-            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Error: invalid move. Try highlighting valid moves.");
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, e.getMessage());
             connections.rootMessage(username, errorMessage);
+        }
+    }
+
+    public void checkIfShouldMove(GameData gameData, ChessMove move, String username) throws InvalidMoveException {
+        if ((gameData.game().currentTeam == BLACK && !Objects.equals(gameData.blackUsername(), username)) || (gameData.game().currentTeam == WHITE && !Objects.equals(gameData.whiteUsername(), username))) {
+            throw new InvalidMoveException("Error: Wait for your turn");
+        }
+        if (gameData.game().currentTeam != gameData.game().gameBoard.getPiece(move.startPosition).getTeamColor()) {
+            throw new InvalidMoveException("Error: You can't move your opponent's piece");
+        }
+        if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
+            throw new InvalidMoveException("Error: Observers cannot move");
+        }
+        if (gameData.game().gameOver) {
+            throw new InvalidMoveException("Error: Game over");
         }
     }
 
@@ -165,14 +186,17 @@ public class WebSocketHandler {
         ChessGame game = gameData.game();
         if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
             connections.rootMessage(username, new ErrorMessage(ERROR, "Error: observers cannot resign"));
+        } else if (game.gameOver){
+            connections.rootMessage(username, new ErrorMessage(ERROR, "Error: game over"));
+        } else {
+            game.endGame();
+            GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            gameDAO.updateGame(updated);
+            String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
+            String message = username + " resigned." + winner + " wins!";
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+            connections.broadcast(username, notificationMessage, true);
         }
-        game.endGame();
-        GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
-        gameDAO.updateGame(updated);
-        String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
-        String message = username + " resigned." + winner + " wins!";
-        NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
-        connections.broadcast(username, notificationMessage, true);
     }
 
 }
