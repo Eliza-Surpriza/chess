@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -15,12 +17,15 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
 import com.google.gson.Gson;
-import websocket.messages.ErrorMessage;
+import websocket.messages.*;
+import static websocket.messages.ServerMessage.ServerMessageType.*;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
+//import static websocket.messages.ServerMessage.ServerMessageType.NOTIFICATION;
 
 
 public class websocketHandler  {
@@ -65,23 +70,52 @@ public class websocketHandler  {
 
     // define connect, make move, leave, resign
 
-    public void connect(Session session, String username, UserGameCommand command) {
-        // um connect I guess? maybe I make a connections class like in petshop. idk.
+    public void connect(Session session, String username, UserGameCommand command) throws IOException {
         connections.add(username, session);
-        // make a server message and send it!
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        String color;
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            color = "white";
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            color = "black";
+        } else {
+            color = "observer";
+        }
+        String message = username + "joined game as " + color;
+        NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(username, notificationMessage, false);
     }
 
-    public void makeMove(Session session, String username, MakeMoveCommand command) {
+    public void makeMove(Session session, String username, MakeMoveCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         try {
             gameData.game().makeMove(command.getMove());
             checkGameStatus(gameData.game());
             gameDAO.updateGame(gameData);
-            // load game (for everyone)
-            // notify others
+            LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData.game());
+            connections.broadcast(username, loadGameMessage, true);
+            String message = username + "moved from " + decipherPosition(command.getMove().startPosition) + " to " + decipherPosition(command.getMove().endPosition);
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+            connections.broadcast(username, notificationMessage, false);
         } catch (InvalidMoveException e) {
-            // send error message :)
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Error: invalid move. Try highlighting valid moves.");
+            connections.rootMessage(username, errorMessage);
         }
+    }
+
+    public String decipherPosition(ChessPosition position) {
+        String column = switch(position.getRow()) {
+            case (1) -> "a";
+            case (2) -> "b";
+            case (3) -> "c";
+            case (4) -> "d";
+            case (5) -> "e";
+            case (6) -> "f";
+            case (7) -> "g";
+            case (8) -> "h";
+            default -> ".";
+        };
+        return column + position.getRow();
     }
 
     public void checkGameStatus(ChessGame game) {
@@ -103,7 +137,7 @@ public class websocketHandler  {
         }
     }
 
-    public void leave(Session session, String username, UserGameCommand command) {
+    public void leave(Session session, String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         GameData updated;
         if (Objects.equals(gameData.whiteUsername(), username)) {
@@ -114,8 +148,10 @@ public class websocketHandler  {
             updated = gameData;
         }
         gameDAO.updateGame(updated);
-        // notify others that username left
-        // disconnect from websocket
+        String message = username + " left the game";
+        NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(username, notificationMessage, false);
+        connections.remove(username);
     }
 
     public void resign(Session session, String username, UserGameCommand command) {

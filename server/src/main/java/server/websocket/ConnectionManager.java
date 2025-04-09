@@ -42,4 +42,10 @@ public class ConnectionManager {
         }
     }
 
+    public void rootMessage(String username, ServerMessage serverMessage) throws IOException {
+        Connection connection = connections.get(username);
+        String json = gson.toJson(serverMessage);
+        connection.send(json);
+    }
+
 }
