@@ -10,7 +10,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static client.ui.EscapeSequences.*;
 
 public class DrawChessBoard {
-    public static final String edgeColor = SET_BG_COLOR_BLUE;
+    public static final String EDGE_COLOR = SET_BG_COLOR_BLUE;
     private static ChessPosition moveFrom;
     private static Collection<ChessMove> moveTo;
 
@@ -31,11 +31,11 @@ public class DrawChessBoard {
     static void upsideDownLoop(PrintStream out, ChessBoard chessBoard) {
         for (int i = 1; i <= 8; i++) {
             String lineNum = " " + i + " ";
-            drawSquare(out, lineNum, edgeColor);
+            drawSquare(out, lineNum, EDGE_COLOR);
             for (int j = 8; j >= 1; j--) {
                 boardSquare(i, j, chessBoard, out);
             }
-            drawSquare(out, lineNum, edgeColor);
+            drawSquare(out, lineNum, EDGE_COLOR);
             newLine(out);
         }
     }
@@ -43,11 +43,11 @@ public class DrawChessBoard {
     static void rightSideUpLoop(PrintStream out, ChessBoard chessBoard) {
         for (int i = 8; i >= 1; i--) {
             String lineNum = " " + i + " ";
-            drawSquare(out, lineNum, edgeColor);
+            drawSquare(out, lineNum, EDGE_COLOR);
             for (int j = 1; j <= 8; j++) {
                 boardSquare(i, j, chessBoard, out);
             }
-            drawSquare(out, lineNum, edgeColor);
+            drawSquare(out, lineNum, EDGE_COLOR);
             newLine(out);
         }
     }
@@ -100,15 +100,15 @@ public class DrawChessBoard {
     }
 
     static void drawHeader(PrintStream out, boolean upsideDown) {
-        drawSquare(out, EMPTY, edgeColor);
+        drawSquare(out, EMPTY, EDGE_COLOR);
         String[] letters = { " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h " };
         if (upsideDown) {
             letters = new String[]{ " h ", " g ", " f ", " e ", " d ", " c ", " b ", " a " };
         }
         for (String letter : letters) {
-            drawSquare(out, letter, edgeColor);
+            drawSquare(out, letter, EDGE_COLOR);
         }
-        drawSquare(out, EMPTY, edgeColor);
+        drawSquare(out, EMPTY, EDGE_COLOR);
         newLine(out);
     }
 

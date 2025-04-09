@@ -97,7 +97,7 @@ public class WebSocketHandler {
             gameDAO.updateGame(updated);
             LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, updated);
             connections.broadcast(username, loadGameMessage, true);
-            String message = username + "moved from " + decipherPosition(move.startPosition) + " to " + decipherPosition(command.getMove().endPosition);
+            String message = username + "moved from " + decipher(move.startPosition) + " to " + decipher(command.getMove().endPosition);
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
             connections.broadcast(username, notificationMessage, false);
         } catch (InvalidMoveException e) {
@@ -107,7 +107,10 @@ public class WebSocketHandler {
     }
 
     public void checkIfShouldMove(GameData gameData, ChessMove move, String username) throws InvalidMoveException {
-        if ((gameData.game().currentTeam == BLACK && !Objects.equals(gameData.blackUsername(), username)) || (gameData.game().currentTeam == WHITE && !Objects.equals(gameData.whiteUsername(), username))) {
+        if (gameData.game().currentTeam == BLACK && !Objects.equals(gameData.blackUsername(), username)) {
+            throw new InvalidMoveException("Error: Wait for your turn");
+        }
+        if (gameData.game().currentTeam == WHITE && !Objects.equals(gameData.whiteUsername(), username)) {
             throw new InvalidMoveException("Error: Wait for your turn");
         }
         if (gameData.game().currentTeam != gameData.game().gameBoard.getPiece(move.startPosition).getTeamColor()) {
@@ -121,7 +124,7 @@ public class WebSocketHandler {
         }
     }
 
-    public String decipherPosition(ChessPosition position) {
+    public String decipher(ChessPosition position) {
         String column = switch(position.getRow()) {
             case (1) -> "a";
             case (2) -> "b";

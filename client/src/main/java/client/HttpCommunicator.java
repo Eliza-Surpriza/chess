@@ -38,12 +38,7 @@ public class HttpCommunicator {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         } else {
-            InputStream errorStream = connection.getErrorStream();
-            String errorMessage = errorStream != null
-                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
-                    : "Unknown error occurred.";
-            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
-            throw new IOException(errorResponse.message());
+            return throwError(connection);
         }
     }
 
@@ -62,12 +57,7 @@ public class HttpCommunicator {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         } else {
-            InputStream errorStream = connection.getErrorStream();
-            String errorMessage = errorStream != null
-                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
-                    : "Unknown error occurred.";
-            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
-            throw new IOException(errorResponse.message());
+            return throwError(connection);
         }
     }
 
@@ -85,13 +75,7 @@ public class HttpCommunicator {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             return "Success";
         } else {
-            InputStream errorStream = connection.getErrorStream();
-            String errorMessage = errorStream != null
-                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
-                    : "Unknown error occurred.";
-
-            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
-            throw new IOException(errorResponse.message());
+            return throwError(connection);
         }
     }
 
@@ -113,13 +97,17 @@ public class HttpCommunicator {
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             return "Success";
         } else {
-            InputStream errorStream = connection.getErrorStream();
-            String errorMessage = errorStream != null
-                    ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
-                    : "Unknown error occurred.";
-            ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
-            throw new IOException(errorResponse.message());
+            return throwError(connection);
         }
+    }
+
+    public String throwError(HttpURLConnection connection) throws IOException {
+        InputStream errorStream = connection.getErrorStream();
+        String errorMessage = errorStream != null
+                ? new String(errorStream.readAllBytes(), StandardCharsets.UTF_8)
+                : "Unknown error occurred.";
+        ErrorResponse errorResponse = gson.fromJson(errorMessage, ErrorResponse.class);
+        throw new IOException(errorResponse.message());
     }
 
 }
