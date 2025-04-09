@@ -25,7 +25,6 @@ import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
-//import static websocket.messages.ServerMessage.ServerMessageType.NOTIFICATION;
 
 
 public class websocketHandler  {
@@ -94,7 +93,7 @@ public class websocketHandler  {
         GameData gameData = gameDAO.getGame(command.getGameID());
         try {
             gameData.game().makeMove(command.getMove());
-            checkGameStatus(gameData.game());
+            checkGameStatus(gameData, username);
             gameDAO.updateGame(gameData);
             LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData.game());
             connections.broadcast(username, loadGameMessage, true);
@@ -122,23 +121,31 @@ public class websocketHandler  {
         return column + position.getRow();
     }
 
-    public void checkGameStatus(ChessGame game) {
+    public void checkGameStatus(GameData gameData, String username) throws IOException {
+        ChessGame game = gameData.game();
         ChessGame.TeamColor otherTeam = (game.currentTeam == WHITE) ? BLACK : WHITE;
+        String otherTeamUsername = (otherTeam == WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
         if (game.isInCheck(otherTeam)) {
-            // notify players
+            sendGameStatusMessage(username, otherTeamUsername + " is in check.");
         }
         if (game.isInCheckmate(otherTeam)) {
             game.endGame();
-            // notify players
+            sendGameStatusMessage(username, otherTeamUsername + " is in checkmate. Game over. " + username + " wins!");
         }
         if (game.isInStalemate(game.currentTeam)) {
             game.endGame();
-            // notify players
+            sendGameStatusMessage(username, username + " is in stalemate. Game over. " + otherTeamUsername + " wins!");
+
         }
         if (game.isInStalemate(otherTeam)) {
             game.endGame();
-            // notify players
+            sendGameStatusMessage(username, otherTeamUsername + " is in stalemate. Game over. " + username + " wins!");
         }
+    }
+
+    public void sendGameStatusMessage(String username, String message) throws IOException {
+        NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(username, notificationMessage, true);
     }
 
     public void leave(Session session, String username, UserGameCommand command) throws IOException {
