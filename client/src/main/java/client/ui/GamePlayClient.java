@@ -88,8 +88,14 @@ public class GamePlayClient implements Client {
         if (repl.color == null) {
             throw new IOException("Only players can resign. If you are done observing, type \"leave\"");
         }
-        server.resign(repl.authToken, repl.gameData.gameID());
-        return "resigning";
+        System.out.print("Type \"yes\" to confirm your desire to resign and forfeit the game\n" + ">>> ");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (Objects.equals(line, "yes")) {
+            server.resign(repl.authToken, repl.gameData.gameID());
+            return "";
+        }
+        return "Ok, you can now continue gameplay.";
     }
 
     public String leave() throws IOException {

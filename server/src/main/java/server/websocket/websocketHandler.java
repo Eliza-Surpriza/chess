@@ -154,11 +154,13 @@ public class websocketHandler  {
         connections.remove(username);
     }
 
-    public void resign(Session session, String username, UserGameCommand command) {
+    public void resign(Session session, String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         gameData.game().endGame();
-        // notify others that username resigned
+        String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
+        String message = username + " resigned." + winner + " wins!";
+        NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(username, notificationMessage, true);
     }
-    // resign: set game to over. notify others
 
 }
