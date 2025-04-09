@@ -127,7 +127,7 @@ public class ChessGame implements Cloneable {
                 this.setTeamTurn(TeamColor.WHITE);
             }
         } else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Error: invalid move");
         }
     }
 
