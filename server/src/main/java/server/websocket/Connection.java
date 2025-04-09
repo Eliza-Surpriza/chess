@@ -9,8 +9,8 @@ public class Connection {
     public Session session;
     public int gameID;
 
-    public Connection(String visitorName, int gameID, Session session) {
-        this.username = visitorName;
+    public Connection(String username, int gameID, Session session) {
+        this.username = username;
         this.gameID = gameID;
         this.session = session;
     }
