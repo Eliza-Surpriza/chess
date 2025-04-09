@@ -80,7 +80,7 @@ public class WebSocketHandler {
         } else {
             color = "observer";
         }
-        String message = username + "joined game as " + color;
+        String message = username + " joined game as " + color;
         NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
         connections.broadcast(username, notificationMessage, false);
         LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData);
@@ -100,7 +100,7 @@ public class WebSocketHandler {
             gameDAO.updateGame(updated);
             LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, updated);
             connections.broadcast(username, loadGameMessage, true);
-            String message = username + "moved from " + decipher(move.startPosition) + " to " + decipher(move.endPosition);
+            String message = username + " moved from " + decipher(move.startPosition) + " to " + decipher(move.endPosition);
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
             connections.broadcast(username, notificationMessage, false);
         } catch (InvalidMoveException e) {
@@ -128,7 +128,7 @@ public class WebSocketHandler {
     }
 
     public String decipher(ChessPosition position) {
-        String column = switch (position.getRow()) {
+        String column = switch (position.getColumn()) {
             case (1) -> "a";
             case (2) -> "b";
             case (3) -> "c";
@@ -144,21 +144,14 @@ public class WebSocketHandler {
 
     public ChessGame checkGameStatus(GameData gameData, String username) throws IOException {
         ChessGame game = gameData.game();
-        ChessGame.TeamColor otherTeam = (game.currentTeam == WHITE) ? BLACK : WHITE;
+        ChessGame.TeamColor otherTeam = game.currentTeam;
         String otherTeamUsername = (otherTeam == WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
-        if (game.isInCheck(otherTeam)) {
-            sendGameStatusMessage(username, otherTeamUsername + " is in check.");
-        }
         if (game.isInCheckmate(otherTeam)) {
             game.endGame();
             sendGameStatusMessage(username, otherTeamUsername + " is in checkmate. Game over. " + username + " wins!");
-        }
-        if (game.isInStalemate(game.currentTeam)) {
-            game.endGame();
-            sendGameStatusMessage(username, username + " is in stalemate. Game over. " + otherTeamUsername + " wins!");
-
-        }
-        if (game.isInStalemate(otherTeam)) {
+        } else if (game.isInCheck(otherTeam)) {
+            sendGameStatusMessage(username, otherTeamUsername + " is in check.");
+        } else if (game.isInStalemate(otherTeam)) {
             game.endGame();
             sendGameStatusMessage(username, otherTeamUsername + " is in stalemate. Game over. " + username + " wins!");
         }

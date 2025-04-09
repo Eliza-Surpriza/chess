@@ -31,7 +31,7 @@ public class WebsocketCommunicator extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) this::onMessage);
+            this.session.addMessageHandler(String.class, this::onMessage);
 
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new IOException(ex.getMessage());
@@ -41,7 +41,11 @@ public class WebsocketCommunicator extends Endpoint {
     public void onMessage(String messageString) {
         try {
             ServerMessage message = gson.fromJson(messageString, ServerMessage.class);
-            serverMessageObserver.notify(message);
+            switch (message.getServerMessageType()) {
+                case NOTIFICATION -> serverMessageObserver.notify(gson.fromJson(messageString, NotificationMessage.class));
+                case ERROR -> serverMessageObserver.notify(gson.fromJson(messageString, ErrorMessage.class));
+                case LOAD_GAME -> serverMessageObserver.notify(gson.fromJson(messageString, LoadGameMessage.class));
+            }
         } catch (Exception ex) {
             serverMessageObserver.notify(new ErrorMessage(ServerMessage.ServerMessageType.ERROR, ex.getMessage()));
         }
@@ -66,11 +70,6 @@ public class WebsocketCommunicator extends Endpoint {
 
     public void leave(String authToken, int gameID) throws IOException {
         sendUserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
-        try {
-            this.session.close();
-        } catch (IOException ex) {
-            throw new IOException(ex.getMessage());
-        }
     }
 
     private void sendUserGameCommand(UserGameCommand.CommandType commandType, String authToken, int gameID) throws IOException {

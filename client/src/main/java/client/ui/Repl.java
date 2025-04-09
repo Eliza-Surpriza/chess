@@ -79,6 +79,7 @@ public class Repl implements ServerMessageObserver {
 
     private void loadGame(GameData gameToDraw) {
         boolean upsideDown = (Objects.equals(color, ChessGame.TeamColor.BLACK));
+        System.out.println();
         drawBoard(gameToDraw.game().gameBoard, upsideDown, null, null);
         System.out.print("\n" + ">>> ");
         gameData = gameToDraw;

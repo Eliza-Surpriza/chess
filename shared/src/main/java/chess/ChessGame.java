@@ -206,7 +206,9 @@ public class ChessGame implements Cloneable {
             ChessPosition position = new ChessPosition(row, col);
             if (gameBoard.getPiece(position) != null
                     && gameBoard.getPiece(position).getTeamColor() == teamColor) {
-                return checkAllMoves(position, teamColor);
+                if (!checkAllMoves(position, teamColor)) {
+                    return false;
+                }
             }
         }
         return true;

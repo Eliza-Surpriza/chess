@@ -70,7 +70,6 @@ public class LoggedInClient implements Client {
             if (gameData == null) {
                 throw new IOException("Game ID not valid. List games to see options.");
             }
-            boolean upsideDown;
             String stringColor;
             if (params[1].equalsIgnoreCase("white")) {
                 repl.color = ChessGame.TeamColor.WHITE;
@@ -95,6 +94,7 @@ public class LoggedInClient implements Client {
             GameData gameData = getGameFromFakeID(params[0]);
             repl.color = null;
             repl.gameData = gameData;
+            repl.isInGame = true;
             server.connect(repl.authToken, gameData.gameID());
             return "observing game " + gameData.gameName() + "\n";
         }
