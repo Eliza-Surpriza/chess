@@ -1,7 +1,6 @@
 package server.websocket;
 
 import chess.ChessGame;
-import chess.ChessMove;
 import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.AuthDAO;
@@ -12,7 +11,6 @@ import exception.UnauthorizedException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
@@ -27,7 +25,7 @@ import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 
 
-public class websocketHandler  {
+public class WebSocketHandler {
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -36,7 +34,7 @@ public class websocketHandler  {
     private final ConnectionManager connections = new ConnectionManager();
 
 
-    public websocketHandler (UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
@@ -46,30 +44,24 @@ public class websocketHandler  {
     public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
-
-            // Throws a custom UnauthorizedException. Yours may work differently.
-            String username = userDAO.getUser(command.getAuthToken()).username();
-
-//            saveSession(command.getGameID(), session);
-
+            String username = authDAO.getAuth(command.getAuthToken()).username();
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leave(session, username, command);
-                case RESIGN -> resign(session, username, command);
+                case MAKE_MOVE -> makeMove(username, (MakeMoveCommand) command);
+                case LEAVE -> leave(username, command);
+                case RESIGN -> resign(username, command);
             }
         } catch (UnauthorizedException ex) {
-            // define an ErrorMessage object and serialize it:)
-            session.getRemote().sendString("msg");
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Error: Unauthorized");
+            String json = gson.toJson(errorMessage);
+            session.getRemote().sendString(json);
         } catch (Exception ex) {
-//            ex.printStackTrace();
-//            sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
-            // define an ErrorMessage object and serialize it:)
-            session.getRemote().sendString("msg");
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Unexpected Error");
+            String json = gson.toJson(errorMessage);
+            session.getRemote().sendString(json);
         }
     }
 
-    // define connect, make move, leave, resign
 
     public void connect(Session session, String username, UserGameCommand command) throws IOException {
         connections.add(username, session);
@@ -89,7 +81,7 @@ public class websocketHandler  {
         connections.rootMessage(username, loadGameMessage);
     }
 
-    public void makeMove(Session session, String username, MakeMoveCommand command) throws IOException {
+    public void makeMove(String username, MakeMoveCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         try {
             gameData.game().makeMove(command.getMove());
@@ -148,7 +140,7 @@ public class websocketHandler  {
         connections.broadcast(username, notificationMessage, true);
     }
 
-    public void leave(Session session, String username, UserGameCommand command) throws IOException {
+    public void leave(String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         GameData updated;
         if (Objects.equals(gameData.whiteUsername(), username)) {
@@ -165,7 +157,7 @@ public class websocketHandler  {
         connections.remove(username);
     }
 
-    public void resign(Session session, String username, UserGameCommand command) throws IOException {
+    public void resign(String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
         gameData.game().endGame();
         String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
