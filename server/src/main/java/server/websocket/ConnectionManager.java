@@ -12,13 +12,13 @@ public class ConnectionManager {
     private final Gson gson = new Gson();
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
-        connections.put(visitorName, connection);
+    public void add(String username, int gameID, Session session) {
+        var connection = new Connection(username, gameID, session);
+        connections.put(username, connection);
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(String username) {
+        connections.remove(username);
     }
 
     public void broadcast(String username, ServerMessage serverMessage, boolean everyone) throws IOException {
@@ -31,14 +31,16 @@ public class ConnectionManager {
             }
         }
         for (var c : removeList) {
-            connections.remove(c.visitorName);
+            connections.remove(c.username);
         }
     }
 
     public void sendMessage(String username, ServerMessage serverMessage, Connection c, boolean everyone) throws IOException {
-        if (everyone || !c.visitorName.equals(username)) {
-            String json = gson.toJson(serverMessage);
-            c.send(json);
+        if (everyone || !c.username.equals(username)) {
+            if (c.gameID == connections.get(username).gameID) {
+                String json = gson.toJson(serverMessage);
+                c.send(json);
+            }
         }
     }
 

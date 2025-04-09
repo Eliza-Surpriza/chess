@@ -69,7 +69,7 @@ public class WebSocketHandler {
 
 
     public void connect(Session session, String username, UserGameCommand command) throws IOException {
-        connections.add(username, session);
+        connections.add(username, command.getGameID(), session);
         GameData gameData = gameDAO.getGame(command.getGameID());
         String color;
         if (Objects.equals(gameData.whiteUsername(), username)) {
