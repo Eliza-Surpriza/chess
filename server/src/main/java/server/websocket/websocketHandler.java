@@ -44,7 +44,7 @@ public class websocketHandler  {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws IOException {
         try {
             UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
@@ -60,11 +60,13 @@ public class websocketHandler  {
                 case RESIGN -> resign(session, username, command);
             }
         } catch (UnauthorizedException ex) {
-            // Serializes and sends the error message
-//            sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
+            // define an ErrorMessage object and serialize it:)
+            session.getRemote().sendString("msg");
         } catch (Exception ex) {
 //            ex.printStackTrace();
 //            sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
+            // define an ErrorMessage object and serialize it:)
+            session.getRemote().sendString("msg");
         }
     }
 
@@ -84,6 +86,8 @@ public class websocketHandler  {
         String message = username + "joined game as " + color;
         NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
         connections.broadcast(username, notificationMessage, false);
+        LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData.game());
+        connections.rootMessage(username, loadGameMessage);
     }
 
     public void makeMove(Session session, String username, MakeMoveCommand command) throws IOException {
