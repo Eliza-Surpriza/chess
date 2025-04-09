@@ -11,6 +11,7 @@ import exception.UnauthorizedException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 
-
+@WebSocket
 public class WebSocketHandler {
 
     private final UserDAO userDAO;
@@ -77,7 +78,7 @@ public class WebSocketHandler {
         String message = username + "joined game as " + color;
         NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
         connections.broadcast(username, notificationMessage, false);
-        LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData.game());
+        LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData);
         connections.rootMessage(username, loadGameMessage);
     }
 
@@ -85,9 +86,10 @@ public class WebSocketHandler {
         GameData gameData = gameDAO.getGame(command.getGameID());
         try {
             gameData.game().makeMove(command.getMove());
-            checkGameStatus(gameData, username);
-            gameDAO.updateGame(gameData);
-            LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, gameData.game());
+            ChessGame game = checkGameStatus(gameData, username);
+            GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            gameDAO.updateGame(updated);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, updated);
             connections.broadcast(username, loadGameMessage, true);
             String message = username + "moved from " + decipherPosition(command.getMove().startPosition) + " to " + decipherPosition(command.getMove().endPosition);
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);
@@ -113,7 +115,7 @@ public class WebSocketHandler {
         return column + position.getRow();
     }
 
-    public void checkGameStatus(GameData gameData, String username) throws IOException {
+    public ChessGame checkGameStatus(GameData gameData, String username) throws IOException {
         ChessGame game = gameData.game();
         ChessGame.TeamColor otherTeam = (game.currentTeam == WHITE) ? BLACK : WHITE;
         String otherTeamUsername = (otherTeam == WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
@@ -133,6 +135,7 @@ public class WebSocketHandler {
             game.endGame();
             sendGameStatusMessage(username, otherTeamUsername + " is in stalemate. Game over. " + username + " wins!");
         }
+        return game;
     }
 
     public void sendGameStatusMessage(String username, String message) throws IOException {
@@ -159,7 +162,13 @@ public class WebSocketHandler {
 
     public void resign(String username, UserGameCommand command) throws IOException {
         GameData gameData = gameDAO.getGame(command.getGameID());
-        gameData.game().endGame();
+        ChessGame game = gameData.game();
+        if (!Objects.equals(username, gameData.whiteUsername()) && !Objects.equals(username, gameData.blackUsername())) {
+            connections.rootMessage(username, new ErrorMessage(ERROR, "Error: observers cannot resign"));
+        }
+        game.endGame();
+        GameData updated = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+        gameDAO.updateGame(updated);
         String winner = (Objects.equals(username, gameData.whiteUsername())) ? gameData.blackUsername() : gameData.whiteUsername();
         String message = username + " resigned." + winner + " wins!";
         NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, message);

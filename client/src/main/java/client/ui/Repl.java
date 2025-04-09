@@ -24,7 +24,6 @@ public class Repl implements ServerMessageObserver {
     public GameData gameData;
     public boolean isInGame;
     public ChessGame.TeamColor color;
-    public ChessGame game;
 
     public Repl(String serverUrl) throws IOException {
         preLogin = new PreLoginClient(serverUrl, this);
@@ -34,7 +33,6 @@ public class Repl implements ServerMessageObserver {
         isLoggedIn = false;
         authToken = null;
         gameData = null;
-        game = null;
         isInGame = false;
         color = null;
     }
@@ -79,11 +77,11 @@ public class Repl implements ServerMessageObserver {
         System.out.print("\n" + ">>> ");
     }
 
-    private void loadGame(ChessGame gameToDraw) {
+    private void loadGame(GameData gameToDraw) {
         boolean upsideDown = (Objects.equals(color, ChessGame.TeamColor.BLACK));
-        drawBoard(gameToDraw.gameBoard, upsideDown, null, null);
+        drawBoard(gameToDraw.game().gameBoard, upsideDown, null, null);
         System.out.print("\n" + ">>> ");
-        game = gameToDraw;
+        gameData = gameToDraw;
     }
 
 }

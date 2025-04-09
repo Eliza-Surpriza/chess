@@ -15,6 +15,7 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import java.util.*;
 
+import static chess.ChessGame.TeamColor.BLACK;
 import static client.ui.DrawChessBoard.drawBoard;
 
 public class GamePlayClient implements Client {
@@ -43,7 +44,7 @@ public class GamePlayClient implements Client {
     }
 
     public String move(String ... params) throws IOException {
-        if (repl.color != repl.game.currentTeam) {
+        if (repl.color != repl.gameData.game().currentTeam) {
             throw new IOException("wait for your turn");
         }
         if (params.length >= 2) {
@@ -52,24 +53,7 @@ public class GamePlayClient implements Client {
             ChessPiece.PieceType promoPiece = ((params.length == 3) ? getPieceFromString(params[2]) : null);
             ChessMove move = new ChessMove(startPosition, endPosition, promoPiece);
             server.makeMove(repl.authToken, repl.gameData.gameID(), move);
-            // ok all of the following actually goes in the server lol
-//            try {
-//                repl.gameData.game().makeMove(move);
-//            } catch(chess.InvalidMoveException e) {
-//                throw new IOException("Invalid move. Try highlighting valid moves.");
-//            }
-//            boolean inCheck = repl.gameData.game().isInCheck(repl.color);
-//            boolean inCheckmate = repl.gameData.game().isInCheckmate(repl.color);
-//            boolean inStalemate = repl.gameData.game().isInStalemate(repl.color);
-            // use websocket to adjust game for everyone
-            // redraw board (maybe highlighted?) but also do this for everyone
-            // golly I think I did a lot here that I was supposed to actually do in the websocket server.
-            // I think I'll give up on highlighting the squares for a move
-
-//            Collection<ChessMove> moveTo = Collections.singletonList(move);
-//            redraw(startPosition, moveTo);
-            // I think this also turns into a websocket message lol
-            return "moving from " + params[0] + " to " + params[1];
+            return "";
         }
         throw new IOException("Expected: highlight b4 (or other position)");
     }
@@ -101,22 +85,21 @@ public class GamePlayClient implements Client {
     public String leave() throws IOException {
         server.leave(repl.authToken, repl.gameData.gameID());
         repl.isInGame = false;
-        repl.game = null;
-        // add call to websocket to notify others
-        // also in websocket set player to null (make sure to check if player is observer)
+        repl.gameData = null;
+        repl.color = null;
         return "left game";
     }
 
     public String redraw(ChessPosition moveFrom, Collection<ChessMove> moveTo) {
-        boolean upsideDown = (Objects.equals(repl.color, ChessGame.TeamColor.BLACK));
-        drawBoard(repl.game.gameBoard, upsideDown, moveFrom, moveTo);
+        boolean upsideDown = (Objects.equals(repl.color, BLACK));
+        drawBoard(repl.gameData.game().gameBoard, upsideDown, moveFrom, moveTo);
         return "";
     }
 
     public String highlight(String ... params) throws IOException {
         if (params.length == 1) {
             ChessPosition chessPosition = readPosition(params[0]);
-            Collection<ChessMove> moveTo = repl.game.validMoves(chessPosition);
+            Collection<ChessMove> moveTo = repl.gameData.game().validMoves(chessPosition);
             redraw(chessPosition, moveTo);
             return "valid moves for " + params[0] + "\n";
         }
